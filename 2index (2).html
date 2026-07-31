@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITSUPERTECH - Fiche de Brief Client</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Caveat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Plus de SDK Firebase : API REST directe (0 Ko de bibliothèque) -->
+    <style>
+        :root{--bleu:#1a5fb4;--bleu-light:#3584e4;--bleu-pale:#d0e4f7;--bleu-bg:#eaf2fc;--bleu-dark:#13447a;--noir:#1a1a2e;--noir-mid:#2d2d44;--gris:#6b7280;--gris-light:#e5e7eb;--gris-pale:#f3f4f6;--blanc:#ffffff;--danger:#dc2626;--success:#16a34a;--radius:10px;--radius-sm:7px;--shadow:0 2px 16px rgba(26,95,180,.08);--shadow-lg:0 8px 32px rgba(26,95,180,.12)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',sans-serif;background:var(--gris-pale);color:var(--noir);min-height:100vh}
+        header{background:var(--blanc);border-bottom:3px solid var(--bleu);padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+        .header-inner{max-width:1060px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px;gap:12px}
+        .logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
+        .logo-mark{width:40px;height:40px;flex-shrink:0}.logo-mark svg{width:100%;height:100%}
+        .logo-text{display:flex;flex-direction:column;line-height:1}
+        .logo-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:19px;color:var(--noir);letter-spacing:-.5px}
+        .logo-sub{font-family:'Caveat',cursive;font-size:13px;color:var(--bleu);font-weight:600;margin-top:1px}
+        .header-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+        .save-indicator{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--gris);padding:5px 12px;border-radius:20px;background:var(--gris-pale);border:1px solid var(--gris-light);transition:all .3s}
+        .save-indicator.saving{color:var(--bleu);border-color:var(--bleu-pale)}
+        .save-indicator.saved{color:var(--success);border-color:#bbf7d0;background:#f0fdf4}
+        .save-dot{width:7px;height:7px;border-radius:50%;background:var(--gris);transition:background .3s}
+        .save-indicator.saving .save-dot{background:var(--bleu);animation:pulse 1s infinite}
+        .save-indicator.saved .save-dot{background:var(--success)}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+        .btn-hdr{height:36px;padding:0 14px;border-radius:var(--radius-sm);background:var(--blanc);border:1px solid var(--gris-light);color:var(--noir-mid);cursor:pointer;font-size:13px;font-weight:500;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:6px;transition:all .2s}
+        .btn-hdr:hover{background:var(--bleu-bg);border-color:var(--bleu-pale);color:var(--bleu)}.btn-hdr i{font-size:13px}
+        main{max-width:1060px;margin:0 auto;padding:28px 24px 80px}
+        .page-title{text-align:center;margin-bottom:28px}
+        .page-title h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(24px,4vw,34px);font-weight:700;color:var(--noir);margin-bottom:4px}
+        .page-title p{color:var(--gris);font-size:14px}
+        .page-title .title-line{width:60px;height:3px;background:var(--bleu);border-radius:2px;margin:12px auto 0}
+        .progress-bar{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:28px}
+        .prog-step{display:flex;align-items:center;cursor:pointer}
+        .prog-circle{width:36px;height:36px;border-radius:50%;border:2px solid var(--gris-light);background:var(--blanc);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--gris);transition:all .3s;position:relative;flex-shrink:0}
+        .prog-circle i{font-size:13px}
+        .prog-step.active .prog-circle{border-color:var(--bleu);background:var(--bleu);color:#fff;box-shadow:0 0 0 4px rgba(26,95,180,.15)}
+        .prog-step.done .prog-circle{border-color:var(--bleu);background:var(--bleu-bg);color:var(--bleu)}
+        .prog-label{position:absolute;top:42px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--gris);white-space:nowrap;font-weight:500}
+        .prog-step.active .prog-label{color:var(--bleu);font-weight:600}
+        .prog-step.done .prog-label{color:var(--bleu)}
+        .prog-line{width:70px;height:2px;background:var(--gris-light);transition:background .3s;flex-shrink:0}
+        .prog-line.active{background:var(--bleu)}
+        .form-page{display:none}.form-page.active{display:block;animation:fadeUp .35s ease}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+        .card{background:var(--blanc);border:1px solid var(--gris-light);border-radius:var(--radius);padding:24px;margin-bottom:16px;box-shadow:var(--shadow);transition:border-color .2s;border-left:4px solid var(--bleu)}
+        .card:hover{border-color:var(--bleu-pale);border-left-color:var(--bleu)}
+        .card-head{display:flex;align-items:center;gap:10px;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--gris-pale)}
+        .card-num{width:28px;height:28px;border-radius:6px;background:var(--bleu);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+        .card-title{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;color:var(--noir)}
+        .badge-count{margin-left:auto;font-size:11px;font-weight:700;min-width:22px;height:22px;border-radius:11px;background:var(--bleu-bg);color:var(--bleu);display:inline-flex;align-items:center;justify-content:center;padding:0 6px}
+        .fg{margin-bottom:14px}.fg:last-child{margin-bottom:0}
+        .fg-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+        .fl{display:block;font-size:12.5px;font-weight:600;color:var(--noir-mid);margin-bottom:5px}
+        .fi{width:100%;padding:9px 12px;background:var(--gris-pale);border:1px solid var(--gris-light);border-radius:var(--radius-sm);color:var(--noir);font-size:13.5px;font-family:'Inter',sans-serif;transition:border-color .2s,box-shadow .2s;outline:none}
+        .fi:focus{border-color:var(--bleu);box-shadow:0 0 0 3px rgba(26,95,180,.1);background:var(--blanc)}
+        .fi::placeholder{color:#9ca3af}
+        textarea.fi{resize:vertical;min-height:72px}
+        select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;cursor:pointer}
+        .cb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
+        .cb-grid.wide{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+        .cb-item{position:relative}
+        .cb-item input[type="checkbox"]{position:absolute;opacity:0;width:0;height:0}
+        .cb-label{display:flex;align-items:center;gap:9px;padding:9px 12px;background:var(--gris-pale);border:1px solid var(--gris-light);border-radius:var(--radius-sm);cursor:pointer;font-size:13px;color:var(--noir-mid);transition:all .2s;user-select:none}
+        .cb-label:hover{border-color:var(--bleu-pale);color:var(--noir);background:var(--bleu-bg)}
+        .cb-box{width:17px;height:17px;border:2px solid var(--gris-light);border-radius:4px;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+        .cb-box i{font-size:9px;color:#fff;opacity:0;transform:scale(0);transition:all .15s}
+        .cb-item input:checked+.cb-label{border-color:var(--bleu);background:var(--bleu-bg);color:var(--bleu-dark)}
+        .cb-item input:checked+.cb-label .cb-box{background:var(--bleu);border-color:var(--bleu)}
+        .cb-item input:checked+.cb-label .cb-box i{opacity:1;transform:scale(1)}
+        .cb-item input:focus-visible+.cb-label{box-shadow:0 0 0 3px rgba(26,95,180,.12)}
+
+        /* SIGNATURE */
+        .sig-wrapper{position:relative}
+        .sig-area{border:2px dashed var(--gris-light);border-radius:var(--radius-sm);background:var(--gris-pale);min-height:110px;position:relative;cursor:crosshair;transition:border-color .2s;overflow:hidden}
+        .sig-area:hover{border-color:var(--bleu-pale)}
+        .sig-area.no-draw{cursor:default}
+        .sig-area canvas{display:block}
+        .sig-placeholder{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--gris);font-size:13px;pointer-events:none;display:flex;align-items:center;gap:8px}
+        .sig-placeholder.hidden{display:none}
+        .sig-toolbar{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
+        .sig-btn{height:32px;padding:0 10px;border-radius:5px;border:1px solid var(--gris-light);background:var(--blanc);color:var(--noir-mid);cursor:pointer;font-size:11.5px;font-weight:500;font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:5px;transition:all .2s;white-space:nowrap}
+        .sig-btn:hover{background:var(--bleu-bg);border-color:var(--bleu-pale);color:var(--bleu)}
+        .sig-btn.active{background:var(--bleu);color:#fff;border-color:var(--bleu)}
+        .sig-btn.danger:hover{background:#fef2f2;border-color:#fecaca;color:var(--danger)}
+        .sig-btn i{font-size:12px}
+        .sig-slider-row{display:none!important}
+        .sig-slider-row label{white-space:nowrap;font-weight:500}
+        .sig-slider-row input[type="range"]{flex:1;height:4px;-webkit-appearance:none;appearance:none;background:var(--gris-light);border-radius:2px;outline:none}
+        .sig-slider-row input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--bleu);cursor:pointer;border:2px solid var(--blanc);box-shadow:0 1px 4px rgba(0,0,0,.2)}
+        .sig-slider-val{min-width:28px;text-align:right;font-weight:600;color:var(--bleu);font-variant-numeric:tabular-nums}
+        .sig-source-preview{position:absolute;bottom:8px;left:8px;width:50px;height:50px;border-radius:4px;border:1px solid var(--bleu-pale);background:#fff;overflow:hidden;display:none;z-index:3;box-shadow:0 2px 8px rgba(0,0,0,.1);cursor:pointer}
+        .sig-source-preview.show{display:block}
+        .sig-source-preview img{width:100%;height:100%;object-fit:cover}
+        .sig-processing{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,.85);display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;z-index:5;border-radius:var(--radius-sm)}
+        .sig-processing.show{display:flex}
+        .sig-spinner{width:28px;height:28px;border:3px solid var(--bleu-pale);border-top-color:var(--bleu);border-radius:50%;animation:spin .7s linear infinite}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .sig-processing span{font-size:12px;color:var(--bleu);font-weight:500}
+
+        /* CAMÉRA OVERLAY */
+        .camera-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.94);z-index:600;display:none;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:12px}
+        .camera-overlay.show{display:flex}
+        .camera-container{position:relative;width:100%;max-width:640px;border-radius:var(--radius);overflow:hidden;background:#000;box-shadow:0 0 60px rgba(0,0,0,.5)}
+        .camera-container video{width:100%;display:block;max-height:60vh;object-fit:cover}
+        .camera-guide{position:absolute;top:10%;left:10%;right:10%;bottom:15%;border:2px dashed rgba(255,255,255,.35);border-radius:8px;pointer-events:none;display:flex;align-items:center;justify-content:center}
+        .camera-guide-label{color:rgba(255,255,255,.4);font-size:14px;font-weight:500;text-align:center;padding:8px;text-shadow:0 1px 4px rgba(0,0,0,.5)}
+        .camera-flash{position:absolute;top:0;left:0;width:100%;height:100%;background:#fff;opacity:0;pointer-events:none;border-radius:var(--radius);transition:opacity .15s}
+        .camera-flash.fire{opacity:.8;transition:none}
+        .camera-header{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:640px;color:#fff}
+        .camera-header h3{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px}
+        .camera-header h3 i{color:var(--bleu-light)}
+        .camera-actions{display:flex;gap:12px;align-items:center}
+        .cam-btn{width:48px;height:48px;border-radius:50%;border:2px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .2s;backdrop-filter:blur(4px)}
+        .cam-btn:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.5)}
+        .cam-btn.close{width:40px;height:40px;font-size:14px}
+        .cam-btn-capture{width:68px;height:68px;border-radius:50%;border:4px solid #fff;background:transparent;cursor:pointer;position:relative;transition:all .15s}
+        .cam-btn-capture::after{content:'';position:absolute;top:4px;left:4px;right:4px;bottom:4px;border-radius:50%;background:#fff;transition:all .15s}
+        .cam-btn-capture:hover::after{background:var(--bleu-light)}
+        .cam-btn-capture:active{transform:scale(.92)}
+        .cam-btn-capture:active::after{background:var(--bleu)}
+        .cam-btn-switch{width:44px;height:44px;border-radius:50%;border:2px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s}
+        .cam-btn-switch:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.5)}
+        .camera-hint{color:rgba(255,255,255,.45);font-size:12px;text-align:center;max-width:400px;line-height:1.5}
+        .camera-error{color:#f87171;font-size:14px;text-align:center;padding:40px 20px;max-width:400px;line-height:1.6}
+        .camera-error i{font-size:40px;display:block;margin-bottom:16px;opacity:.6}
+        .camera-fallback-btn{margin-top:16px;padding:12px 24px;border-radius:var(--radius-sm);background:var(--bleu);color:#fff;border:none;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:all .2s}
+        .camera-fallback-btn:hover{background:var(--bleu-dark);transform:translateY(-1px)}
+
+        /* BOUTONS */
+        .nav-btns{display:flex;justify-content:space-between;align-items:center;margin-top:28px;gap:12px}
+        .btn{padding:10px 24px;border-radius:var(--radius-sm);font-size:13.5px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;border:none;transition:all .2s;display:inline-flex;align-items:center;gap:7px}
+        .btn-bleu{background:var(--bleu);color:#fff;box-shadow:0 2px 8px rgba(26,95,180,.25)}
+        .btn-bleu:hover{background:var(--bleu-dark);box-shadow:0 4px 14px rgba(26,95,180,.35);transform:translateY(-1px)}
+        .btn-outline{background:var(--blanc);color:var(--noir-mid);border:1px solid var(--gris-light)}
+        .btn-outline:hover{background:var(--gris-pale);border-color:var(--bleu-pale);color:var(--bleu)}
+        .btn-success{background:var(--success);color:#fff;box-shadow:0 2px 8px rgba(22,163,74,.25)}
+        .btn-success:hover{background:#15803d;transform:translateY(-1px)}
+        .btn-danger{background:var(--blanc);color:var(--danger);border:1px solid rgba(220,38,38,.25)}
+        .btn-danger:hover{background:#fef2f2}
+        .btn-mail{background:var(--noir);color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+        .btn-mail:hover{background:var(--noir-mid);transform:translateY(-1px)}
+        .btn-print{background:var(--blanc);color:var(--bleu);border:2px solid var(--bleu)}
+        .btn-print:hover{background:var(--bleu);color:#fff}
+        .btn-save{background:var(--success);color:#fff;border:none;box-shadow:0 2px 8px rgba(22,163,74,.2)}
+        .btn-save:hover{background:#15803d;transform:translateY(-1px)}
+        .btn-validate{background:linear-gradient(135deg,#1a5fb4,#3584e4);color:#fff;border:none;box-shadow:0 3px 12px rgba(26,95,180,.3);font-size:14px;padding:11px 28px}
+        .btn-validate:hover{box-shadow:0 5px 18px rgba(26,95,180,.4);transform:translateY(-1px)}
+        .btn-hdr-validate{background:linear-gradient(135deg,#1a5fb4,#3584e4)!important;color:#fff!important;border:none!important}
+        .btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+        .btn-group{display:flex;gap:10px;flex-wrap:wrap}
+
+        /* MODAL */
+        .modal-bg{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+        .modal-bg.show{display:flex}
+        .modal{background:var(--blanc);border-radius:var(--radius);max-width:560px;width:100%;max-height:90vh;overflow-y:auto;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:modalIn .3s ease}
+        @keyframes modalIn{from{opacity:0;transform:scale(.96) translateY(16px)}to{opacity:1;transform:scale(1) translateY(0)}}
+        .modal h2{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;margin-bottom:20px;color:var(--noir);display:flex;align-items:center;gap:10px}
+        .modal h2 i{color:var(--bleu)}
+        .modal p{color:var(--gris);font-size:14px;line-height:1.6;margin-bottom:16px}
+        .modal-actions{display:flex;gap:10px;margin-top:20px;justify-content:flex-end;flex-wrap:wrap}
+        .email-opt{padding:8px 14px;border-radius:var(--radius-sm);border:1px solid var(--gris-light);background:var(--gris-pale);font-size:12.5px;font-weight:500;color:var(--noir-mid);cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif}
+        .email-opt:hover,.email-opt.active{border-color:var(--bleu);background:var(--bleu-bg);color:var(--bleu)}
+
+        /* TOAST */
+        .toast-box{position:fixed;top:76px;right:20px;z-index:1000;display:flex;flex-direction:column;gap:8px}
+        .toast{padding:12px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow-lg);max-width:400px;animation:toastIn .35s ease,toastOut .35s ease 2.8s forwards}
+        .toast-ok{background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d}
+        .toast-err{background:#fef2f2;border:1px solid #fecaca;color:#dc2626}
+        .toast-info{background:var(--bleu-bg);border:1px solid var(--bleu-pale);color:var(--bleu-dark)}
+        @keyframes toastIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+        @keyframes toastOut{from{opacity:1}to{opacity:0;transform:translateX(30px)}}
+        ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--gris-light);border-radius:3px}
+
+        @media(max-width:768px){
+            .fg-row{grid-template-columns:1fr}.cb-grid{grid-template-columns:1fr 1fr}.cb-grid.wide{grid-template-columns:1fr}
+            .card{padding:18px}.prog-line{width:36px}.prog-label{font-size:8px}.prog-circle{width:30px;height:30px;font-size:11px}
+            .nav-btns{flex-direction:column-reverse}.nav-btns .btn,.nav-btns .btn-group{width:100%;justify-content:center}
+            .modal{padding:20px}.header-right .btn-hdr span{display:none}
+            .btn-group{flex-direction:column}.btn-group .btn{justify-content:center}
+            .sig-toolbar{gap:3px}.sig-btn{padding:0 7px;font-size:11px;height:30px}
+            .camera-container video{max-height:45vh}.cam-btn-capture{width:60px;height:60px}
+        }
+        @media(max-width:480px){main{padding:16px 12px 60px}.prog-label{display:none}.cb-grid{grid-template-columns:1fr}.camera-guide{top:5%;left:5%;right:5%;bottom:10%}}
+
+        .sig-date-inline{margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+        .sig-date-inline .fl{font-size:12px;color:var(--gris);white-space:nowrap}
+        .sig-date-inline .fi{max-width:160px}
+
+        @media print{
+            @page{size:A4;margin:10mm}
+            *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+            body{background:#fff!important;font-size:12.5px!important;line-height:1.5!important;color:#000!important;-webkit-text-size-adjust:100%}
+            header,.progress-bar,.nav-btns,.toast-box,.modal-bg,.camera-overlay,.sig-toolbar,.sig-slider-row,.sig-processing,.sig-source-preview,.sig-placeholder{display:none!important}
+            main{padding:0!important;max-width:100%!important;margin:0!important}
+
+            /* === TITRE PRINCIPAL (masqué, on utilise ::before) === */
+            .page-title{display:none!important}
+
+            /* === PAGE 1 : en-tete ITSUPERTECH === */
+            #page-1{position:relative;padding:0!important;border:none!important;margin:0!important}
+            #page-1::before{content:'ITSUPERTECH';display:block;text-align:center;font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#1a5fb4!important;-webkit-text-fill-color:#1a5fb4!important;letter-spacing:2px;text-transform:uppercase;padding:10px 20px 4px 20px!important;margin-bottom:1px;border-bottom:2.5px solid #1a5fb4!important}
+            #page-1::after{content:'Fiche de Brief Client  \2014  Organisation \00b7 Conception Graphique \00b7 Impression';display:block;text-align:center;font-size:10.5px!important;color:#666!important;white-space:pre-line;line-height:1.4;padding-bottom:10px!important;margin-bottom:6px;letter-spacing:.5px}
+
+            /* === PAGES 2 & 3 : pas de saut de page force, pas de cadre === */
+            #page-2,#page-3{position:relative;padding:0!important;border:none!important;margin:0!important}
+            #page-2::before,#page-3::before{display:none!important}
+
+            /* === PAGES === */
+            .form-page{display:block!important;padding:0 12px 8px 12px!important;margin:0!important}
+            .form-page.active{display:block!important}
+
+            /* === CARTES === */
+            .card{border:none!important;border-left:none!important;box-shadow:none!important;border-radius:0!important;padding:8px 0 10px 0!important;margin-bottom:0!important;break-inside:avoid!important}
+            .card-head{margin-bottom:6px!important;padding:5px 10px!important;border-bottom:2px solid #1a5fb4!important;display:flex;align-items:center;gap:7px;background:#eaf2fc!important;margin-top:8px!important}
+            .card-num{background:#1a5fb4!important;width:22px!important;height:22px!important;font-size:11px!important;border-radius:3px!important;flex-shrink:0}
+            .card-title{color:#1a5fb4!important;font-size:13px!important;font-weight:700!important;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:.4px}
+            .badge-count{display:none!important}
+
+            /* === CHAMPS === */
+            .fl{font-size:11px!important;color:#222!important;font-weight:700!important;margin-bottom:2px!important;text-transform:uppercase;letter-spacing:.3px}
+            .fi{border:none!important;border-bottom:1.5px solid #888!important;background:transparent!important;color:#000!important;font-size:12.5px!important;padding:3px 2px!important;border-radius:0!important;margin-bottom:5px!important;min-height:auto!important;font-family:'Inter',sans-serif;height:auto!important}
+            textarea.fi{min-height:40px!important;height:auto!important;border:1px solid #aaa!important}
+            select.fi{border-bottom:1.5px solid #888!important;appearance:none!important;background-image:none!important;padding-right:2px!important;background:#fff!important;font-size:12.5px!important}
+            .fg{margin-bottom:4px!important}.fg-row{display:grid!important;grid-template-columns:1fr 1fr!important;gap:6px 14px!important;margin-bottom:4px!important}
+
+            /* === CHECKBOXES === */
+            .cb-grid{grid-template-columns:repeat(4,1fr)!important;gap:4px 10px!important}
+            .cb-grid.wide{grid-template-columns:repeat(4,1fr)!important;gap:4px 12px!important}
+            .cb-item{margin:0!important;padding:0!important}
+            .cb-label{background:transparent!important;border:none!important;border-bottom:1px dotted #bbb!important;color:#222!important;font-size:11.5px!important;padding:3px 0!important;border-radius:0!important;margin-bottom:0!important;display:flex!important;align-items:center!important;gap:4px!important;line-height:1.4!important}
+            .cb-box{display:none!important}
+            .cb-item input:checked+.cb-label{border-bottom:1.5px solid #1a5fb4!important;color:#1a5fb4!important;font-weight:700!important}
+            .cb-item input:checked+.cb-label::before{content:'\2713';font-weight:700;color:#1a5fb4;font-size:12px}
+
+            /* === SIGNATURES === */
+            .sig-wrapper{margin:0!important}
+            .sig-area{border:1.5px solid #888!important;background:#fff!important;min-height:70px!important;max-height:90px!important;overflow:hidden!important;border-radius:0!important}
+            .sig-area canvas{width:100%!important;height:80px!important}
+            .sig-date-inline{margin-top:4px!important;display:flex!important;align-items:center!important;gap:6px!important}
+            .sig-date-inline .fl{font-size:11px!important;color:#222!important;font-weight:600!important}
+            .sig-date-inline .fi{border:none!important;border-bottom:1.5px solid #888!important;background:transparent!important;font-size:12px!important;padding:2px 2px!important;max-width:140px!important}
+
+            /* === FOOTER supprimé === */
+        }
+        @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-inner">
+        <a href="#" class="logo" onclick="return false">
+            <div class="logo-mark">
+                <svg viewBox="0 0 48 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs><linearGradient id="logoGrad" x1="0" y1="0" x2="48" y2="60" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#3584e4"/><stop offset="100%" stop-color="#1a5fb4"/></linearGradient><linearGradient id="logoGrad2" x1="10" y1="0" x2="38" y2="60" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#62a0ea"/><stop offset="50%" stop-color="#3584e4"/><stop offset="100%" stop-color="#1a5fb4"/></linearGradient></defs>
+                    <circle cx="24" cy="10" r="8.5" fill="url(#logoGrad)"/>
+                    <path d="M24 18.5C24 18.5 22 22 18 28C14 34 10 38 10 42C10 46 13 50 17 52C20 53.5 23 54 24 54C25 54 28 53.5 31 52C35 50 38 46 38 42C38 38 34 34 30 28C26 22 24 18.5 24 18.5Z" fill="url(#logoGrad2)"/>
+                    <path d="M18 28C14 26 8 28 6 32C4.5 35 5.5 37 7 36.5C8.5 36 10 33 14 31C16 30 17.5 29.5 18 28Z" fill="url(#logoGrad)"/>
+                    <path d="M30 28C34 26 40 28 42 32C43.5 35 42.5 37 41 36.5C39.5 36 38 33 34 31C32 30 30.5 29.5 30 28Z" fill="url(#logoGrad)"/>
+                    <path d="M20 50C18 54 14 58 12 59C10 59.5 10 58 12 56.5C14 55 17 52 19 48Z" fill="url(#logoGrad)"/>
+                    <path d="M28 50C30 54 34 58 36 59C38 59.5 38 58 36 56.5C34 55 31 52 29 48Z" fill="url(#logoGrad)"/>
+                </svg>
+            </div>
+            <div class="logo-text"><span class="logo-name">ITSUPERTECH</span><span class="logo-sub">organization</span></div>
+        </a>
+        <div class="header-right">
+            <div class="save-indicator" id="save-ind"><span class="save-dot"></span><span id="save-txt">Brouillon</span></div>
+            <button class="btn-hdr btn-hdr-validate" onclick="validateBrief()" title="Valider et enregistrer dans la base" aria-label="Valider"><i class="fas fa-cloud-upload-alt"></i><span>Valider</span></button>
+            <button class="btn-hdr" onclick="openEmailModal()" title="Envoyer par email" aria-label="Envoyer"><i class="fas fa-envelope"></i><span>Envoyer</span></button>
+            <button class="btn-hdr" onclick="doPrint()" title="Imprimer" aria-label="Imprimer"><i class="fas fa-print"></i><span>Imprimer</span></button>
+        </div>
+    </div>
+</header>
+
+<!-- CAMÉRA OVERLAY -->
+<div class="camera-overlay" id="camera-overlay">
+    <div class="camera-header">
+        <h3><i class="fas fa-camera"></i> Photographier la signature</h3>
+        <button class="cam-btn close" onclick="closeCamera()" aria-label="Fermer"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="camera-container" id="camera-container">
+        <video id="camera-video" autoplay playsinline muted></video>
+        <div class="camera-guide"><span class="camera-guide-label">Placez la signature dans ce cadre</span></div>
+        <div class="camera-flash" id="camera-flash"></div>
+    </div>
+    <div class="camera-actions" id="camera-actions">
+        <button class="cam-btn-switch" onclick="switchCamera()" title="Changer de caméra" aria-label="Changer de caméra"><i class="fas fa-sync-alt"></i></button>
+        <button class="cam-btn-capture" onclick="capturePhoto()" title="Prendre la photo" aria-label="Capturer"></button>
+        <button class="cam-btn" onclick="closeCamera()" title="Annuler" aria-label="Annuler"><i class="fas fa-arrow-left"></i></button>
+    </div>
+    <div class="camera-hint" id="camera-hint">Cadrez la signature sur papier puis appuyez sur le bouton blanc pour capturer</div>
+</div>
+
+<canvas id="camera-capture-canvas" style="display:none"></canvas>
+<!-- Inputs cachés pour fallback caméra native (fonctionne sans HTTPS) -->
+<input type="file" id="cam-native-client" accept="image/*" capture="environment" style="display:none" onchange="handleNativeCapture('client',this)">
+<input type="file" id="cam-native-itsuper" accept="image/*" capture="environment" style="display:none" onchange="handleNativeCapture('itsuper',this)">
+
+<main>
+    <div class="page-title">
+        <h1>Fiche de Brief Client</h1>
+        <p>Remplissez les informations ci-dessous pour définir votre besoin</p>
+        <div class="title-line"></div>
+    </div>
+    <div class="progress-bar">
+        <div class="prog-step active" onclick="goTo(1)"><div class="prog-circle">1</div><span class="prog-label">Généralités</span></div>
+        <div class="prog-line"></div>
+        <div class="prog-step" onclick="goTo(2)"><div class="prog-circle">2</div><span class="prog-label">Contenu</span></div>
+        <div class="prog-line"></div>
+        <div class="prog-step" onclick="goTo(3)"><div class="prog-circle">3</div><span class="prog-label">Technique & Validation</span></div>
+    </div>
+
+    <!-- PAGE 1 -->
+    <div class="form-page active" id="page-1">
+        <div class="card"><div class="card-head"><div class="card-num">1</div><div class="card-title">Informations Générales Client</div></div>
+            <div class="fg-row"><div class="fg"><label class="fl" for="f_entreprise">Nom de l'entreprise</label><input class="fi" id="f_entreprise" data-s placeholder="Ex: ABC SARL"></div><div class="fg"><label class="fl" for="f_contact">Nom du contact</label><input class="fi" id="f_contact" data-s placeholder="Ex: Jean Dupont"></div></div>
+            <div class="fg-row"><div class="fg"><label class="fl" for="f_tel">Téléphone</label><input class="fi" id="f_tel" data-s placeholder="Ex: +213 555 123 456"></div><div class="fg"><label class="fl" for="f_email">Email</label><input class="fi" id="f_email" type="email" data-s placeholder="Ex: contact@abc.com"></div></div>
+            <div class="fg"><label class="fl" for="f_adresse">Adresse</label><input class="fi" id="f_adresse" data-s placeholder="Ex: Rue des Frères, Alger"></div>
+            <div class="fg-row"><div class="fg"><label class="fl" for="f_date">Date du brief</label><input class="fi" id="f_date" type="date" data-s></div><div class="fg"><label class="fl" for="f_ref">Référence du projet</label><input class="fi" id="f_ref" data-s placeholder="Ex: PRJ-2024-001"></div></div>
+        </div>
+        <div class="card"><div class="card-head"><div class="card-num">2</div><div class="card-title">Type de Support Demandé</div><span class="badge-count" id="c-support">0</span></div><div class="cb-grid" id="g-support"></div><div class="fg" style="margin-top:12px;display:none" id="gr-autre-support"><label class="fl">Précisez</label><input class="fi" id="f_autre_support" data-s placeholder="Décrivez le support..."></div></div>
+        <div class="card"><div class="card-head"><div class="card-num">3</div><div class="card-title">Objectif du Support</div><span class="badge-count" id="c-objectif">0</span></div><div class="cb-grid" id="g-objectif"></div><div class="fg" style="margin-top:12px;display:none" id="gr-autre-objectif"><label class="fl">Précisez</label><input class="fi" id="f_autre_objectif" data-s placeholder="Décrivez l'objectif..."></div></div>
+        <div class="card"><div class="card-head"><div class="card-num">4</div><div class="card-title">Public Cible (Destinataires)</div><span class="badge-count" id="c-public">0</span></div><div class="cb-grid" id="g-public"></div><div class="fg" style="margin-top:12px;display:none" id="gr-autre-public"><label class="fl">Précisez</label><input class="fi" id="f_autre_public" data-s placeholder="Décrivez le public cible..."></div></div>
+        <div class="nav-btns"><div></div><button class="btn btn-bleu" onclick="next()">Suivant <i class="fas fa-arrow-right"></i></button></div>
+    </div>
+
+    <!-- PAGE 2 -->
+    <div class="form-page" id="page-2">
+        <div class="card"><div class="card-head"><div class="card-num">5</div><div class="card-title">Informations à afficher</div><span class="badge-count" id="c-info">0</span></div><div class="cb-grid wide" id="g-info"></div></div>
+        <div class="card"><div class="card-head"><div class="card-num">6</div><div class="card-title">Rédaction de texte</div><span class="badge-count" id="c-redaction">0</span></div><div class="cb-grid" id="g-redaction"></div><div class="fg" style="margin-top:14px"><label class="fl">Texte fourni par le client</label><textarea class="fi" id="f_texte" data-s placeholder="Collez ou saisissez le texte ici..."></textarea></div></div>
+        <div class="card"><div class="card-head"><div class="card-num">7</div><div class="card-title">Besoins linguistiques</div><span class="badge-count" id="c-langue">0</span></div><div class="cb-grid" id="g-langue"></div><div class="fg" style="margin-top:12px;display:none" id="gr-autre-langue"><label class="fl">Précisez</label><input class="fi" id="f_autre_langue" data-s placeholder="Ex: Espagnol, Turc..."></div></div>
+        <div class="card"><div class="card-head"><div class="card-num">8</div><div class="card-title">Images fournies</div><span class="badge-count" id="c-images">0</span></div><div class="cb-grid" id="g-images"></div></div>
+        <div class="card"><div class="card-head"><div class="card-num">9</div><div class="card-title">Documents existants</div><span class="badge-count" id="c-docs">0</span></div><div class="cb-grid" id="g-docs"></div></div>
+        <div class="card"><div class="card-head"><div class="card-num">10</div><div class="card-title">Préférences de style</div><span class="badge-count" id="c-style">0</span></div><div class="cb-grid" id="g-style"></div><div class="fg-row" style="margin-top:14px"><div class="fg"><label class="fl" for="f_couleurs">Couleurs préférées</label><input class="fi" id="f_couleurs" data-s placeholder="Ex: Bleu marine, Blanc, Or..."></div><div class="fg"><label class="fl" for="f_refvis">Référence visuelle (lien)</label><input class="fi" id="f_refvis" data-s placeholder="https://..."></div></div></div>
+        <div class="nav-btns"><button class="btn btn-outline" onclick="prev()"><i class="fas fa-arrow-left"></i> Précédent</button><button class="btn btn-bleu" onclick="next()">Suivant <i class="fas fa-arrow-right"></i></button></div>
+    </div>
+
+    <!-- PAGE 3 -->
+    <div class="form-page" id="page-3">
+        <div class="card"><div class="card-head"><div class="card-num">11</div><div class="card-title">Spécifications Techniques & Contraintes</div></div>
+            <div class="fg-row"><div class="fg"><label class="fl" for="f_couleursrespect">Couleurs à respecter</label><input class="fi" id="f_couleursrespect" data-s placeholder="Ex: Pantone 289 C, #1a5fb4..."></div><div class="fg"><label class="fl" for="f_nbpages">Nombre de pages / faces</label><input class="fi" id="f_nbpages" data-s placeholder="Ex: 2 faces, 8 pages..."></div></div>
+            <div class="fg-row"><div class="fg"><label class="fl" for="f_formatfich">Format de fichier</label><select class="fi" id="f_formatfich" data-s><option value="">-- Choisir --</option><option>PDF</option><option>AI (Illustrator)</option><option>PSD (Photoshop)</option><option>SVG</option><option>PNG</option><option>JPEG</option><option>CDR (CorelDraw)</option><option>Autre</option></select></div><div class="fg"><label class="fl" for="f_resolution">Résolution (DPI)</label><select class="fi" id="f_resolution" data-s><option value="">-- Choisir --</option><option>72 DPI (Écran)</option><option>150 DPI (Standard)</option><option>300 DPI (Haute qualité)</option><option>600 DPI (Pro)</option></select></div></div>
+            <div class="fg-row"><div class="fg"><label class="fl" for="f_dimensions">Dimensions finales</label><select class="fi" id="f_dimensions" data-s><option value="">-- Choisir --</option><option>A0 (84.1 x 118.9 cm)</option><option>A1 (59.4 x 84.1 cm)</option><option>A2 (42 x 59.4 cm)</option><option>A3 (29.7 x 42 cm)</option><option>A4 (21 x 29.7 cm)</option><option>A5 (14.8 x 21 cm)</option><option>A6 (10.5 x 14.8 cm)</option><option>B2 (50 x 70.7 cm)</option><option>B3 (35.3 x 50 cm)</option><option>B5 (17.6 x 25 cm)</option><option>Carte de visite (8.5 x 5.4 cm)</option><option>Flyer A5 (14.8 x 21 cm)</option><option>Flyer A6 (10.5 x 14.8 cm)</option><option>Dépliant A4 fermé (21 x 29.7 cm)</option><option>Dépliant A4 ouvert (42 x 29.7 cm)</option><option>Brochure A4 (21 x 29.7 cm)</option><option>Brochure A5 (14.8 x 21 cm)</option><option>Affiche 40 x 60 cm</option><option>Affiche 60 x 80 cm</option><option>Affiche 80 x 120 cm</option><option>Bâche (sur mesure)</option><option>Enseigne (sur mesure)</option><option>Roll-up (85 x 200 cm)</option><option>Autre (préciser)</option></select></div><div class="fg"><label class="fl" for="f_marge">Marges (fond perdu)</label><input class="fi" id="f_marge" data-s placeholder="Ex: 3mm tout autour"></div></div>
+            <div class="fg-row"><div class="fg"><label class="fl" for="f_impression">Type d'impression</label><select class="fi" id="f_impression" data-s><option value="">-- Choisir --</option><option>Numérique</option><option>Offset</option><option>Grand format</option><option>Sérigraphie</option><option>Autre</option></select></div><div class="fg"><label class="fl" for="f_papier">Type de papier</label><select class="fi" id="f_papier" data-s><option value="">-- Choisir --</option><option>Couché brillant 135g</option><option>Couché brillant 170g</option><option>Couché brillant 250g</option><option>Couché brillant 300g</option><option>Couché mat 135g</option><option>Couché mat 170g</option><option>Couché mat 250g</option><option>Couché mat 300g</option><option>Offset 80g</option><option>Offset 90g</option><option>Offset 120g</option><option>Premium 300g</option><option>Carton 350g</option><option>Carton 400g</option><option>Autocollant papier</option><option>Autocollant vinyle</option><option>Papier recyclé</option><option>Canvas / Toile</option><option>Papier photo brillant</option><option>Papier photo mat</option><option>PP synthétique (plastique)</option><option>PVC rigide</option><option>Alu / Dibond (panneau)</option><option>Autre (préciser)</option></select></div></div>
+            <div class="fg"><label class="fl" for="f_contraintes">Autres contraintes techniques</label><textarea class="fi" id="f_contraintes" data-s placeholder="Ex: Mode CMJN obligatoire, typographies spécifiques..."></textarea></div>
+        </div>
+        <div class="card"><div class="card-head"><div class="card-num">12</div><div class="card-title">Observations & Remarques particulières</div></div><div class="fg"><label class="fl" for="f_observations">Remarques complémentaires</label><textarea class="fi" id="f_observations" data-s placeholder="Détails supplémentaires, exigences spécifiques..." style="min-height:90px"></textarea></div></div>
+        <div class="card"><div class="card-head"><div class="card-num">13</div><div class="card-title">Documents à joindre au dossier</div><span class="badge-count" id="c-joindre">0</span></div><div class="cb-grid" id="g-joindre"></div></div>
+        <div class="card"><div class="card-head"><div class="card-num">14</div><div class="card-title">Délais & Livraison</div></div>
+            <div class="fg-row"><div class="fg"><label class="fl" for="f_dateliv">Date de livraison</label><input class="fi" id="f_dateliv" type="date" data-s></div><div class="fg"><label class="fl" for="f_exemplaires">Nombre d'exemplaires</label><input class="fi" id="f_exemplaires" type="number" data-s placeholder="Ex: 500" min="0"></div></div>
+            <div class="fg"><label class="fl" for="f_mode_livraison">Mode de livraison des fichiers</label><select class="fi" id="f_mode_livraison" data-s><option value="">-- Choisir --</option><option>Email</option><option>Google Drive</option><option>WeTransfer</option><option>USB / Clé physique</option><option>Autre</option></select></div>
+        </div>
+
+        <!-- SIGNATURES -->
+        <div class="card">
+            <div class="card-head"><div class="card-num">15</div><div class="card-title">Validation & Engagements</div></div>
+            <div class="cb-grid" id="g-validation" style="margin-bottom:18px"></div>
+            <div class="fg-row">
+                <div class="fg">
+                    <label class="fl">Signature du client</label>
+                    <div class="sig-wrapper">
+                        <div class="sig-area" id="sig-client"><canvas id="canvas-client"></canvas><span class="sig-placeholder" id="ph-client"><i class="fas fa-pen-fancy"></i> Signez ici</span><div class="sig-source-preview" id="preview-client"></div><div class="sig-processing" id="proc-client"><div class="sig-spinner"></div><span>Traitement...</span></div></div>
+                        <div class="sig-toolbar">
+                            <button class="sig-btn active" id="mode-draw-client" onclick="setSigMode('client','draw')"><i class="fas fa-pen"></i> Dessiner</button>
+                            <button class="sig-btn" id="mode-photo-client" onclick="openCamera('client')"><i class="fas fa-camera"></i> Photo</button>
+                            <button class="sig-btn" id="mode-upload-client" onclick="triggerUpload('client')"><i class="fas fa-image"></i> Fichier</button>
+                            <button class="sig-btn danger" onclick="clearSig('client')"><i class="fas fa-eraser"></i> Effacer</button>
+                        </div>
+                        <div class="sig-slider-row" id="slider-client"><label>Seuil :</label><input type="range" min="10" max="90" value="45" id="thresh-client" oninput="reprocessSig('client')"><span class="sig-slider-val" id="thresh-val-client">45</span></div>
+                        <input type="file" id="file-client" accept="image/*" style="display:none" onchange="handleSigFile('client',this)">
+                    </div>
+                    <div class="sig-date-inline"><label class="fl" for="f_date_sig_client">Fait à , le</label><input class="fi" id="f_date_sig_client" type="date" data-s></div>
+                </div>
+                <div class="fg">
+                    <label class="fl">Signature ITSUPERTECH</label>
+                    <div class="sig-wrapper">
+                        <div class="sig-area" id="sig-itsuper"><canvas id="canvas-itsuper"></canvas><span class="sig-placeholder" id="ph-itsuper"><i class="fas fa-pen-fancy"></i> Signez ici</span><div class="sig-source-preview" id="preview-itsuper"></div><div class="sig-processing" id="proc-itsuper"><div class="sig-spinner"></div><span>Traitement...</span></div></div>
+                        <div class="sig-toolbar">
+                            <button class="sig-btn active" id="mode-draw-itsuper" onclick="setSigMode('itsuper','draw')"><i class="fas fa-pen"></i> Dessiner</button>
+                            <button class="sig-btn" id="mode-photo-itsuper" onclick="openCamera('itsuper')"><i class="fas fa-camera"></i> Photo</button>
+                            <button class="sig-btn" id="mode-upload-itsuper" onclick="triggerUpload('itsuper')"><i class="fas fa-image"></i> Fichier</button>
+                            <button class="sig-btn danger" onclick="clearSig('itsuper')"><i class="fas fa-eraser"></i> Effacer</button>
+                        </div>
+                        <div class="sig-slider-row" id="slider-itsuper"><label>Seuil :</label><input type="range" min="10" max="90" value="45" id="thresh-itsuper" oninput="reprocessSig('itsuper')"><span class="sig-slider-val" id="thresh-val-itsuper">45</span></div>
+                        <input type="file" id="file-itsuper" accept="image/*" style="display:none" onchange="handleSigFile('itsuper',this)">
+                    </div>
+                    <div class="sig-date-inline"><label class="fl" for="f_date_sig_itsuper">Fait à , le</label><input class="fi" id="f_date_sig_itsuper" type="date" data-s></div>
+                </div>
+            </div>
+
+        </div>
+        <div class="nav-btns">
+            <button class="btn btn-outline" onclick="prev()"><i class="fas fa-arrow-left"></i> Précédent</button>
+            <div class="btn-group">
+                <button class="btn btn-danger" onclick="confirmReset()"><i class="fas fa-trash-alt"></i> Réinitialiser</button>
+                <button class="btn btn-validate" onclick="validateBrief()"><i class="fas fa-cloud-upload-alt"></i> Valider le brief</button>
+                <button class="btn btn-print" onclick="doPrint()"><i class="fas fa-print"></i> Imprimer</button>
+                <button class="btn btn-mail" onclick="openEmailModal()"><i class="fas fa-envelope"></i> Envoyer</button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Modal Email -->
+<div class="modal-bg" id="m-email">
+    <div class="modal">
+        <h2><i class="fas fa-envelope"></i> Envoyer le brief par email</h2>
+        <p>Ouvrez votre email et joignez le PDF que vous avez enregistre via Imprimer > Enregistrer au format PDF.</p>
+        <div class="fg" style="margin-bottom:14px"><label class="fl" for="m_to">Destinataire</label><input class="fi" id="m_to" type="email" placeholder="email@exemple.com"></div>
+        <div class="fg" style="margin-bottom:14px"><label class="fl" for="m_cc">CC (copie)</label><input class="fi" id="m_cc" type="email" placeholder="copie@exemple.com (optionnel)"></div>
+        <div class="fg" style="margin-bottom:14px"><label class="fl" for="m_subject">Objet</label><input class="fi" id="m_subject" value="Brief Client - ITSUPERTECH"></div>
+        <div class="modal-actions"><button class="btn btn-outline" onclick="closeModal('m-email')">Annuler</button><button class="btn btn-bleu" onclick="sendEmailWithPDF()"><i class="fas fa-paper-plane"></i> Envoyer le PDF</button></div>
+    </div>
+</div>
+
+<div class="modal-bg" id="m-reset">
+    <div class="modal" style="max-width:420px">
+        <h2><i class="fas fa-exclamation-triangle" style="color:var(--danger)"></i> Réinitialiser</h2>
+        <p>Toutes les données seront effacées. Action irréversible.</p>
+        <div class="modal-actions"><button class="btn btn-outline" onclick="closeModal('m-reset')">Annuler</button><button class="btn btn-danger" onclick="doReset()" style="background:var(--danger);color:#fff;border:none"><i class="fas fa-trash-alt"></i> Tout effacer</button></div>
+    </div>
+</div>
+
+<div class="toast-box" id="toast-box"></div>
+
+
+<script>
+// ===================================================================
+//  GOOGLE SHEETS BACKEND — 0 Ko de bibliothèque
+//  Plus de Firebase ! Utilise Google Apps Script (voir google-apps-script.js)
+// ===================================================================
+var APP_URL='https://script.google.com/macros/s/AKfycbxCHmVJW0CXTNd4omYMq8F8i_Yfgntk8flYE5UmdpvFt-WZUJNAYzseQjbYjYHZsx-1/exec';
+var APP_KEY='itsuptech_brief_2024';
+var firebaseReady=false;
+
+// Test de connexion
+fetch(APP_URL+'?key='+APP_KEY+'&action=list',{method:'GET'}).then(function(r){return r.json()}).then(function(d){if(d.ok!==undefined||d.briefs!==undefined){firebaseReady=true;document.getElementById('save-txt').textContent='Connecté';document.getElementById('save-ind').className='save-indicator saved';setTimeout(function(){document.getElementById('save-ind').className='save-indicator';document.getElementById('save-txt').textContent='Brouillon'},3000)}else throw new Error('Erreur')}).catch(function(e){firebaseReady=false;console.warn('Backend indisponible')});
+
+
+const CB={support:{grid:'g-support',count:'c-support',items:[{id:'s-flyer',l:'Flyer'},{id:'s-bache',l:'Bâche'},{id:'s-carte',l:'Carte de visite'},{id:'s-brochure',l:'Brochure'},{id:'s-affiche',l:'Affiche'},{id:'s-depliant',l:'Dépliant'},{id:'s-logo',l:'Logo'},{id:'s-carte-menu',l:'Carte menu'},{id:'s-enseigne',l:'Enseigne'},{id:'s-sticker',l:'Sticker'},{id:'s-rouleau',l:'Roll-up'},{id:'s-autre',l:'Autre'}],autre:{input:'f_autre_support',group:'gr-autre-support'}},objectif:{grid:'g-objectif',count:'c-objectif',items:[{id:'o-presenter',l:"Présenter l'entreprise"},{id:'o-promouvoir',l:'Promouvoir un événement'},{id:'o-lancer',l:'Lancer un produit'},{id:'o-informer',l:'Informer'},{id:'o-vendre',l:'Vendre un produit/service'},{id:'o-identite',l:'Créer une identité visuelle'},{id:'o-fideliser',l:'Fidéliser la clientèle'},{id:'o-autre',l:'Autre'}],autre:{input:'f_autre_objectif',group:'gr-autre-objectif'}},public:{grid:'g-public',count:'c-public',items:[{id:'p-entreprises',l:'Entreprises'},{id:'p-particuliers',l:'Particuliers'},{id:'p-etudiants',l:'Étudiants'},{id:'p-administrations',l:'Administrations'},{id:'p-associations',l:'Associations'},{id:'p-enfants',l:'Enfants / Jeunes'},{id:'p-seniors',l:'Seniors'},{id:'p-autre',l:'Autre'}],autre:{input:'f_autre_public',group:'gr-autre-public'}},info:{grid:'g-info',count:'c-info',items:[{id:'i-presentation',l:'Présentation entreprise'},{id:'i-coordonnees',l:'Coordonnées'},{id:'i-services',l:'Liste des services'},{id:'i-produits',l:'Liste des produits'},{id:'i-tarifs',l:'Tarifs'},{id:'i-temoignages',l:'Témoignages clients'},{id:'i-horaires',l:"Horaires d'ouverture"},{id:'i-reseaux',l:'Réseaux sociaux'},{id:'i-site',l:'Site web'},{id:'i-promo',l:'Promotion / Offre spéciale'}]},redaction:{grid:'g-redaction',count:'c-redaction',items:[{id:'r-client',l:'Le client fournit le texte'},{id:'r-itsuper',l:'ITSUPERTECH rédige'},{id:'r-ensemble',l:'Révision ensemble'}]},langue:{grid:'g-langue',count:'c-langue',items:[{id:'l-fr',l:'Français'},{id:'l-en',l:'Anglais'},{id:'l-ar',l:'Arabe'},{id:'l-tz',l:'Tamazight'},{id:'l-autre',l:'Autre'}],autre:{input:'f_autre_langue',group:'gr-autre-langue'}},images:{grid:'g-images',count:'c-images',items:[{id:'img-logo',l:'Logo HD'},{id:'img-photos',l:'Photos de produits'},{id:'img-libres',l:'Images libres de droits'},{id:'img-pas',l:"Pas d'images"},{id:'img-autre',l:'Autre'}]},docs:{grid:'g-docs',count:'c-docs',items:[{id:'d-ancien',l:'Ancien support imprimé'},{id:'d-charte',l:'Charte graphique'},{id:'d-brochure',l:'Brochures existantes'},{id:'d-aucun',l:'Aucun document'},{id:'d-autre',l:'Autre'}]},style:{grid:'g-style',count:'c-style',items:[{id:'st-moderne',l:'Moderne'},{id:'st-classique',l:'Classique'},{id:'st-minimaliste',l:'Minimaliste'},{id:'st-colore',l:'Coloré'},{id:'st-epure',l:'Épuré'},{id:'st-professionnel',l:'Professionnel'},{id:'st-luxe',l:'Luxe / Premium'},{id:'st-playful',l:'Ludique / Créatif'}]},joindre:{grid:'g-joindre',count:'c-joindre',items:[{id:'j-logo',l:'Logo vectoriel'},{id:'j-charte',l:'Charte graphique'},{id:'j-photos',l:'Photos haute résolution'},{id:'j-texte',l:'Textes rédigés'},{id:'j-ancien',l:'Ancienne version'},{id:'j-autre',l:'Autre'}]},validation:{grid:'g-validation',count:null,items:[{id:'v-info',l:"Les informations fournies sont exactes"},{id:'v-droit',l:"J'ai les droits sur les images/fichiers fournis"},{id:'v-delai',l:"J'accepte les délais discutés"},{id:'v-prix',l:"Je prends connaissance des conditions tarifaires"}]}};
+
+let step=1,autoTimer=null;
+const sigs={},sigModes={},sigSourceImgs={};
+let cameraStream=null,cameraTarget=null,cameraFacing='environment';
+
+document.addEventListener('DOMContentLoaded',()=>{
+    for(const[g,d]of Object.entries(CB)){const el=document.getElementById(d.grid);if(!el)continue;d.items.forEach(it=>{const div=document.createElement('div');div.className='cb-item';div.innerHTML=`<input type="checkbox" id="${it.id}" data-g="${g}"><label class="cb-label" for="${it.id}"><span class="cb-box"><i class="fas fa-check"></i></span>${it.l}</label>`;el.appendChild(div)})}
+    document.getElementById('f_date').value=new Date().toISOString().split('T')[0];
+    document.querySelectorAll('input[data-g]').forEach(cb=>{cb.addEventListener('change',()=>{updateCounts();handleAutre(cb);autoSave()})});
+    document.querySelectorAll('[data-s]').forEach(el=>{el.addEventListener('input',autoSave);el.addEventListener('change',autoSave)});
+    updateCounts();initSig('client');initSig('itsuper');sigModes.client='draw';sigModes.itsuper='draw';loadAutoSave();
+});
+
+function handleAutre(cb){const g=cb.dataset.g,d=CB[g];if(!d||!d.autre)return;if(cb.id.endsWith('-autre')){const grp=document.getElementById(d.autre.group);if(grp)grp.style.display=cb.checked?'block':'none'}}
+function updateCounts(){for(const[g,d]of Object.entries(CB)){if(!d.count)continue;const n=document.querySelectorAll(`input[data-g="${g}"]:checked`).length;const el=document.getElementById(d.count);if(el){el.textContent=n;el.style.transform='scale(1.3)';setTimeout(()=>el.style.transform='scale(1)',200);el.style.transition='transform 0.2s'}}}
+function goTo(s){if(s>=1&&s<=3&&s<=step+1)setStep(s)}
+function next(){if(step<3)setStep(step+1)}
+function prev(){if(step>1)setStep(step-1)}
+function setStep(s){document.querySelectorAll('.form-page').forEach(p=>p.classList.remove('active'));document.getElementById(`page-${s}`).classList.add('active');const steps=document.querySelectorAll('.prog-step'),lines=document.querySelectorAll('.prog-line');steps.forEach((el,i)=>{const n=i+1;el.classList.remove('active','done');if(n===s){el.classList.add('active');el.querySelector('.prog-circle').textContent=n}else if(n<s){el.classList.add('done');el.querySelector('.prog-circle').innerHTML='<i class="fas fa-check"></i>'}else{el.querySelector('.prog-circle').textContent=n}});lines.forEach((l,i)=>l.classList.toggle('active',i<s-1));step=s;window.scrollTo({top:0,behavior:'smooth'});if(s===3)setTimeout(()=>{resizeSig('client');resizeSig('itsuper')},150)}
+
+function autoSave(){const ind=document.getElementById('save-ind'),txt=document.getElementById('save-txt');ind.className='save-indicator saving';txt.textContent='Enregistrement...';clearTimeout(autoTimer);autoTimer=setTimeout(()=>{try{localStorage.setItem('itsup_autosave',JSON.stringify(collectData()))}catch(e){}ind.className='save-indicator saved';txt.textContent='Sauvegardé';setTimeout(()=>{ind.className='save-indicator';txt.textContent='Brouillon'},3000)},800)}
+function loadAutoSave(){try{const r=localStorage.getItem('itsup_autosave');if(!r)return;loadData(JSON.parse(r));toast('Brouillon restauré','info')}catch(e){}}
+// Cache les signatures compressees pour ne pas recompresser a chaque fois
+var _sigCache={client:null,itsuper:null};
+function compressSig(name){
+    if(_sigCache[name])return _sigCache[name];
+    var canvas=sigs[name];if(!canvas||canvas.width===0)return'';
+    try{
+        var tmp=document.createElement('canvas');
+        var maxW=250,scale=Math.min(1,maxW/(canvas.width/2));
+        var w=Math.round(canvas.width/2*scale),h=Math.round(canvas.height/2*scale);
+        tmp.width=w;tmp.height=h;
+        tmp.getContext('2d').drawImage(canvas,0,0,w,h);
+        var data=tmp.toDataURL('image/jpeg',0.35);
+        _sigCache[name]=data;
+        return data;
+    }catch(e){return''}
+}
+function invalidateSigCache(name){_sigCache[name]=null}
+function collectData(){const d={};document.querySelectorAll('[data-s]').forEach(el=>d[el.id]=el.value);d._cb={};for(const[g,gd]of Object.entries(CB))d._cb[g]=gd.items.filter(it=>document.getElementById(it.id).checked).map(it=>it.id);d._sig_client=compressSig('client');d._sig_itsuper=compressSig('itsuper');return d}
+function loadData(d){document.querySelectorAll('[data-s]').forEach(el=>{if(d[el.id]!==undefined)el.value=d[el.id]});if(d._cb){for(const[g,gd]of Object.entries(CB)){gd.items.forEach(it=>{const cb=document.getElementById(it.id);cb.checked=d._cb[g]&&d._cb[g].includes(it.id);handleAutre(cb)})}}['client','itsuper'].forEach(n=>{if(d[`_sig_${n}`]&&d[`_sig_${n}`]!=='data:,'){const img=new Image();img.onload=()=>{resizeSig(n);const ctx=sigs[n].getContext('2d');ctx.clearRect(0,0,sigs[n].width,sigs[n].height);ctx.drawImage(img,0,0,sigs[n].width/2,sigs[n].height/2);document.getElementById(`ph-${n}`).classList.add('hidden')};img.src=d[`_sig_${n}`]}});updateCounts()}
+function doPrint(){ generatePDF('print') }
+function saveBrief(){ generatePDF('save') }
+
+/* ============================================================
+   GÉNÉRATION PDF — IMPRESSION NAVIGATEUR (3 PAGES)
+   Compatible file://, http://, https://
+   ============================================================ */
+var _pdfGenerating = false;
+var _printMode = false;
+
+function generatePDF(mode) {
+    if (_pdfGenerating) { toast('Génération en cours, patientez...', 'info'); return; }
+    _pdfGenerating = true;
+    _printMode = true;
+
+    var savedStep = step;
+
+    // Afficher toutes les pages (le CSS @media print s'occupe du reste)
+    document.querySelectorAll('.form-page').forEach(function(p) {
+        p.classList.add('active');
+    });
+
+    // S'assurer que les canvas de signature ont une taille valide
+    ['client', 'itsuper'].forEach(function(name) {
+        var c = document.getElementById('canvas-' + name);
+        if (c && (c.width === 0 || c.height === 0)) {
+            var area = c.parentElement;
+            var w = area ? area.offsetWidth : 300;
+            var h = area ? Math.max(110, area.offsetHeight) : 110;
+            c.width = Math.max(1, w * 2);
+            c.height = Math.max(1, h * 2);
+            c.style.width = w + 'px';
+            c.style.height = h + 'px';
+        }
+    });
+
+    if(mode==='save') toast('Choisissez \"Enregistrer au format PDF\" dans la fenetre', 'info');
+    else toast('Fenetre d\'impression ouverte', 'info');
+    _afterPrintCallback = null;
+
+    setTimeout(function() {
+        window.print();
+    }, 300);
+
+    // Detecter la fin de l'impression pour restaurer l'interface
+    var restored = false;
+    function restore() {
+        if (restored) return;
+        restored = true;
+        _pdfGenerating = false;
+        _printMode = false;
+        document.querySelectorAll('.form-page').forEach(function(p) {
+            p.classList.remove('active');
+        });
+        document.getElementById('page-' + savedStep).classList.add('active');
+        if (_afterPrintCallback) { _afterPrintCallback(); _afterPrintCallback = null; }
+    }
+
+    // La boite d'impression bloque le JS. Quand elle se ferme, on restaure.
+    // focus/mouseover reviennent apres fermeture de la boite d'impression
+    var restoreTimer = setTimeout(restore, 60000); // timeout de securite 60s
+    function onUserReturn() {
+        clearTimeout(restoreTimer);
+        setTimeout(restore, 300);
+        document.removeEventListener('focus', onUserReturn);
+        document.removeEventListener('mouseover', onUserReturn);
+    }
+    document.addEventListener('focus', onUserReturn);
+    document.addEventListener('mouseover', onUserReturn);
+}
+
+var _afterPrintCallback = null;
+
+/* ENVOI EMAIL */
+function sendEmailWithPDF(){
+    var to=document.getElementById('m_to').value.trim();
+    if(!to){toast('Veuillez saisir un email','err');return}
+    closeModal('m-email');
+    var ent=document.getElementById('f_entreprise').value.trim()||'Client';
+    var subject=encodeURIComponent('Brief Client - '+ent+' - ITSUPERTECH');
+    var m='mailto:'+encodeURIComponent(to)+'?subject='+subject;
+    var cc=document.getElementById('m_cc').value.trim();
+    if(cc)m+='&cc='+encodeURIComponent(cc);
+    window.location.href=m;
+    toast('Joignez le PDF enregistre a votre email','info');
+}
+
+
+/* ===================================================================
+   VALIDATION — ENVOI VERS FIREBASE
+   =================================================================== */
+/* === DICTIONNAIRE DE CODAGE : cases -> codes courts === */
+// Ex: 's2' = support index 2 = 'Carte de visite'
+// L'admin decode automatiquement avec le meme dictionnaire
+var CB_PREFIX={support:'s',objectif:'o',public:'p',info:'i',redaction:'r',langue:'l',images:'img',docs:'d',style:'st',joindre:'j'};
+var CB_KEY={support:'supports',public:'publicCible',info:'infosContenu',docs:'documents',joindre:'fichiersJoindre'};
+
+function validateBrief(){
+    if(!firebaseReady){toast('Firebase non connecte','err');return}
+    if(!navigator.onLine){toast('Pas de connexion internet','err');return}
+    var checks=document.querySelectorAll('input[data-g="validation"]:checked');
+    if(checks.length<4){toast('Cochez les 4 cases de validation (section 15) avant de valider. Actuellement : '+checks.length+'/4','err');setStep(3);return}
+    var ent=document.getElementById('f_entreprise').value.trim();
+    if(!ent){toast('Saisissez le nom de l\'entreprise (page 1) avant de valider','err');setStep(1);return}
+    var btns=document.querySelectorAll('.btn-validate, .btn-hdr-validate');
+    btns.forEach(function(b){b.disabled=true;b.innerHTML='<i class="fas fa-check"></i> Enregistre'});
+    toast('Brief enregistre !','ok');
+    try{localStorage.removeItem('itsup_autosave')}catch(e){}
+    document.getElementById('save-txt').textContent='Envoye';
+    document.getElementById('save-ind').className='save-indicator saved';
+
+    // Construction + envoi en arriere-plan (le client ne voit rien)
+    var doc={entreprise:ent};
+    ['contact','email','telephone','adresse'].forEach(function(k){var v=(document.getElementById('f_'+k).value||'').trim();if(v)doc[k]=v});
+    var dv=document.getElementById('f_date').value;if(dv)doc.date=dv;
+    ['support','objectif','public','info','redaction','langue','images','docs','style','joindre'].forEach(function(g){
+        var gd=CB[g];if(!gd)return;var codes=[];
+        gd.items.forEach(function(it,idx){if(document.getElementById(it.id)&&document.getElementById(it.id).checked)codes.push(CB_PREFIX[g]+idx)});
+        if(codes.length>0){var key=CB_KEY[g]||(g+'s');doc[key]=codes}
+    });
+    ['f_ref','f_autre_support','f_autre_objectif','f_autre_public','f_texte','f_autre_langue','f_couleurs','f_refvis','f_couleursrespect','f_nbpages','f_formatfich','f_resolution','f_dimensions','f_marge','f_impression','f_papier','f_contraintes','f_observations','f_dateliv','f_exemplaires','f_mode_livraison','f_date_sig_client','f_date_sig_itsuper'].forEach(function(id){var v=(document.getElementById(id).value||'').trim();if(v)doc[id]=v});
+    var sigC=compressSig('client'),sigI=compressSig('itsuper');
+    if(sigC)doc.signature_client=sigC;if(sigI)doc.signature_itsuper=sigI;
+    doc.statut='nouveau';
+    doc.date_creation=new Date().toISOString();
+    doc.date_creation_str=new Date().toLocaleString('fr-FR');
+
+    fetch(APP_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'create',key:APP_KEY,data:doc})}).then(function(r){return r.json()}).then(function(ref){
+        btns.forEach(function(b){b.disabled=false;b.innerHTML='<i class="fas fa-cloud-upload-alt"></i> Valider'});
+    }).catch(function(err){
+        toast('Erreur reseau, reessayez : '+err.message,'err');
+        document.getElementById('save-txt').textContent='Erreur';
+        document.getElementById('save-ind').className='save-indicator';
+        btns.forEach(function(b){b.disabled=false;b.innerHTML='<i class="fas fa-cloud-upload-alt"></i> Valider'});
+    });
+}
+
+/* EMAIL */
+function openEmailModal(){const ce=document.getElementById('f_email').value.trim();if(ce)document.getElementById('m_to').value=ce;document.getElementById('m_subject').value=`Brief Client - ${document.getElementById('f_entreprise').value.trim()||'Client'} - ITSUPERTECH`;document.getElementById('m-email').classList.add('show')}
+function getLabel(id){for(const gd of Object.values(CB)){const f=gd.items.find(it=>it.id===id);if(f)return f.l}return id}
+
+/* ===================================================================
+   CAMÉRA — AVEC FALLBACK AUTOMATIQUE SANS HTTPS
+   =================================================================== */
+
+async function openCamera(targetName) {
+    cameraTarget = targetName;
+    const overlay = document.getElementById('camera-overlay');
+    const container = document.getElementById('camera-container');
+    const actions = document.getElementById('camera-actions');
+    const hint = document.getElementById('camera-hint');
+
+    // Réinitialiser le contenu
+    container.innerHTML = `<video id="camera-video" autoplay playsinline muted></video><div class="camera-guide"><span class="camera-guide-label">Placez la signature dans ce cadre</span></div><div class="camera-flash" id="camera-flash"></div>`;
+    actions.style.display = 'flex';
+    hint.style.display = '';
+    hint.textContent = 'Cadrez la signature sur papier puis appuyez sur le bouton blanc pour capturer';
+
+    overlay.classList.add('show');
+
+    // Vérifier si getUserMedia est disponible
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showCameraFallback('getUserMedia n\'est pas supporté par ce navigateur.');
+        return;
+    }
+
+    try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: cameraFacing, width: { ideal: 1280 }, height: { ideal: 720 } },
+            audio: false
+        });
+
+        const vid = document.getElementById('camera-video');
+        vid.srcObject = cameraStream;
+        await vid.play();
+
+    } catch (err) {
+        console.warn('getUserMedia échoué, fallback vers caméra native:', err.name, err.message);
+
+        // Si c'est une erreur de sécurité/HTTPS/permission → fallback
+        showCameraFallback(err);
+    }
+}
+
+function showCameraFallback(err) {
+    const container = document.getElementById('camera-container');
+    const actions = document.getElementById('camera-actions');
+    const hint = document.getElementById('camera-hint');
+
+    actions.style.display = 'none';
+    hint.style.display = 'none';
+
+    let msg = '';
+    let showBtn = true;
+
+    if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        msg = "Vous avez refusé l'accès à la caméra, ou le navigateur ne peut pas la demander sur cette page (HTTP sans HTTPS).";
+    } else if (err.name === 'NotFoundError') {
+        msg = "Aucune caméra détectée sur cet appareil.";
+        showBtn = false;
+    } else if (err.name === 'NotReadableError') {
+        msg = "La caméra est peut-être déjà utilisée par une autre application.";
+    } else if (typeof err === 'string') {
+        msg = err;
+    } else {
+        msg = "La caméra en direct nécessite une connexion sécurisée (HTTPS).";
+    }
+
+    container.innerHTML = `
+        <div class="camera-error">
+            <i class="fas fa-camera-slash"></i>
+            <strong>Caméra en direct indisponible</strong><br><br>
+            ${msg}
+            ${showBtn ? `<br><br><button class="camera-fallback-btn" onclick="useNativeCamera()"><i class="fas fa-camera"></i> Utiliser l'appareil photo du téléphone</button><br><span style="font-size:11px;color:rgba(248,113,113,.6);margin-top:8px;display:inline-block">Ouvre l'appareil photo natif (fonctionne sans HTTPS)</span>` : ''}
+        </div>
+    `;
+}
+
+/* Fallback : ouvrir l'appareil photo natif via input[capture] */
+function useNativeCamera() {
+    closeCamera();
+    // Déclencher l'input caché avec capture="environment"
+    const input = document.getElementById(`cam-native-${cameraTarget}`);
+    if (input) {
+        input.value = '';
+        input.click();
+    }
+}
+
+/* Quand la caméra native capture une photo */
+function handleNativeCapture(name, input) {
+    const file = input.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { toast('Sélectionnez une image', 'err'); return; }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+            sigSourceImgs[name] = img;
+            const preview = document.getElementById(`preview-${name}`);
+            preview.innerHTML = `<img src="${e.target.result}" alt="Source">`;
+            preview.classList.add('show');
+            setSigMode(name, 'scan');
+            processSignatureImage(name, img);
+            toast('Photo capturée avec succès', 'ok');
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+async function switchCamera() {
+    cameraFacing = cameraFacing === 'environment' ? 'user' : 'environment';
+    if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
+    try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: cameraFacing, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
+        const vid = document.getElementById('camera-video');
+        if (!vid) return;
+        vid.srcObject = cameraStream;
+        await vid.play();
+    } catch (err) { toast('Impossible de changer de caméra', 'err'); cameraFacing = cameraFacing === 'environment' ? 'user' : 'environment'; }
+}
+
+function capturePhoto() {
+    const video = document.getElementById('camera-video');
+    if (!video || !video.videoWidth) return;
+    const flash = document.getElementById('camera-flash');
+    if (flash) { flash.classList.add('fire'); setTimeout(() => flash.classList.remove('fire'), 150); }
+    const canvas = document.getElementById('camera-capture-canvas');
+    canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d'); ctx.drawImage(video, 0, 0);
+    const dataURL = canvas.toDataURL('image/png');
+    const img = new Image();
+    img.onload = function() {
+        closeCamera();
+        sigSourceImgs[cameraTarget] = img;
+        const preview = document.getElementById(`preview-${cameraTarget}`);
+        preview.innerHTML = `<img src="${dataURL}" alt="Source">`;
+        preview.classList.add('show');
+        setSigMode(cameraTarget, 'scan');
+        processSignatureImage(cameraTarget, img);
+    };
+    img.src = dataURL;
+}
+
+function closeCamera() {
+    document.getElementById('camera-overlay').classList.remove('show');
+    if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
+    const container = document.getElementById('camera-container');
+    if (container && !container.querySelector('.camera-error')) {
+        container.innerHTML = `<video id="camera-video" autoplay playsinline muted></video><div class="camera-guide"><span class="camera-guide-label">Placez la signature dans ce cadre</span></div><div class="camera-flash" id="camera-flash"></div>`;
+    }
+    document.getElementById('camera-actions').style.display = 'flex';
+    document.getElementById('camera-hint').style.display = '';
+}
+
+/* Upload fichier */
+function triggerUpload(name) { const inp = document.getElementById(`file-${name}`); inp.value = ''; inp.click(); }
+function handleSigFile(name, input) {
+    const file = input.files[0]; if (!file) return;
+    if (!file.type.startsWith('image/')) { toast('Sélectionnez une image', 'err'); return; }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() { sigSourceImgs[name] = img; const preview = document.getElementById(`preview-${name}`); preview.innerHTML = `<img src="${e.target.result}" alt="Source">`; preview.classList.add('show'); setSigMode(name, 'scan'); processSignatureImage(name, img); };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+/* SIGNATURE DESSIN */
+function initSig(name){
+    const canvas=document.getElementById(`canvas-${name}`),ph=document.getElementById(`ph-${name}`),ctx=canvas.getContext('2d');
+    sigs[name]=canvas;let drawing=false;
+    function pos(e){const r=canvas.getBoundingClientRect();const t=e.touches?e.touches[0]:e;return{x:t.clientX-r.left,y:t.clientY-r.top}}
+    function start(e){if(sigModes[name]!=='draw')return;e.preventDefault();drawing=true;const p=pos(e);ctx.setTransform(2,0,0,2,0,0);ctx.beginPath();ctx.moveTo(p.x,p.y);ph.classList.add('hidden')}
+    function draw(e){if(!drawing||sigModes[name]!=='draw')return;e.preventDefault();const p=pos(e);ctx.setTransform(2,0,0,2,0,0);ctx.lineTo(p.x,p.y);ctx.strokeStyle='#1a5fb4';ctx.lineWidth=2.5;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke()}
+    function end(){drawing=false}
+    canvas.addEventListener('mousedown',start);canvas.addEventListener('mousemove',draw);canvas.addEventListener('mouseup',end);canvas.addEventListener('mouseleave',end);
+    canvas.addEventListener('touchstart',start,{passive:false});canvas.addEventListener('touchmove',draw,{passive:false});canvas.addEventListener('touchend',end);
+    resizeSig(name);
+}
+function resizeSig(name){const canvas=sigs[name];if(!canvas)return;const area=canvas.parentElement;const w=area.offsetWidth;const h=Math.max(110,area.offsetHeight);const imgData=canvas.toDataURL();canvas.width=w*2;canvas.height=h*2;canvas.style.width=w+'px';canvas.style.height=h+'px';const ctx=canvas.getContext('2d');ctx.scale(2,2);if(imgData&&imgData!=='data:,'){const img=new Image();img.onload=()=>ctx.drawImage(img,0,0,w,h);img.src=imgData}}
+function clearSig(name){const ctx=sigs[name].getContext('2d');ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,sigs[name].width,sigs[name].height);document.getElementById(`ph-${name}`).classList.remove('hidden');document.getElementById(`slider-${name}`).classList.remove('visible');const prev=document.getElementById(`preview-${name}`);prev.classList.remove('show');prev.innerHTML='';delete sigSourceImgs[name];invalidateSigCache(name);setSigMode(name,'draw');autoSave()}
+function setSigMode(name,mode){sigModes[name]=mode;const area=document.getElementById(`sig-${name}`);area.classList.toggle('no-draw',mode!=='draw');area.style.cursor=mode==='draw'?'crosshair':'default';document.getElementById(`mode-draw-${name}`).classList.toggle('active',mode==='draw');document.getElementById(`mode-photo-${name}`).classList.toggle('active',false);document.getElementById(`mode-upload-${name}`).classList.toggle('active',false);document.getElementById(`slider-${name}`).classList.toggle('visible',mode==='scan'&&!!sigSourceImgs[name])}
+
+/* TRAITEMENT D'IMAGE — AFFICHAGE DIRECT SANS NETTOYAGE */
+function processSignatureImage(name,img){
+    const procEl=document.getElementById(`proc-${name}`);procEl.classList.add('show');
+    requestAnimationFrame(()=>{setTimeout(()=>{
+        const canvas=sigs[name],ctx=canvas.getContext('2d');const w=canvas.width/2,h=canvas.height/2;
+        ctx.setTransform(1,0,0,1,0,0);
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        const ratio=Math.min(w/img.width,h/img.height);const dw=img.width*ratio,dh=img.height*ratio;const dx=(w-dw)/2,dy=(h-dh)/2;
+        ctx.setTransform(2,0,0,2,0,0);
+        ctx.drawImage(img,dx,dy,dw,dh);
+        document.getElementById(`ph-${name}`).classList.add('hidden');
+        document.getElementById(`slider-${name}`).classList.remove('visible');
+        procEl.classList.remove('show');toast('Photo ajoutée','ok');autoSave();
+    },50)})
+}
+function reprocessSig(name){/* Plus utilisé */}
+
+/* MODALS */
+function closeModal(id){document.getElementById(id).classList.remove('show')}
+document.querySelectorAll('.modal-bg').forEach(bg=>{bg.addEventListener('click',e=>{if(e.target===bg)bg.classList.remove('show')})});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelectorAll('.modal-bg.show').forEach(m=>m.classList.remove('show'));closeCamera()}});
+function confirmReset(){document.getElementById('m-reset').classList.add('show')}
+function doReset(){document.querySelectorAll('[data-s]').forEach(el=>{if(el.type==='date')el.value=new Date().toISOString().split('T')[0];else el.value=''});document.querySelectorAll('input[data-g]').forEach(cb=>{cb.checked=false;handleAutre(cb)});clearSig('client');clearSig('itsuper');updateCounts();try{localStorage.removeItem('itsup_autosave')}catch(e){}closeModal('m-reset');setStep(1);toast('Formulaire réinitialisé','info')}
+
+function toast(msg,type){const box=document.getElementById('toast-box');const cls=type==='ok'?'toast-ok':type==='err'?'toast-err':'toast-info';const icon=type==='ok'?'fa-check-circle':type==='err'?'fa-times-circle':'fa-info-circle';const t=document.createElement('div');t.className=`toast ${cls}`;t.innerHTML=`<i class="fas ${icon}"></i> ${msg}`;box.appendChild(t);setTimeout(()=>{if(t.parentNode)t.remove()},3400)}
+window.addEventListener('resize',()=>{resizeSig('client');resizeSig('itsuper')});
+</script>
+</body>
+</html>

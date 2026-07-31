@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITSUPERTECH - Administration des Briefs</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Caveat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Plus de SDK Firebase : API REST directe (0 Ko de bibliothèque) -->
+    <style>
+        :root{--bleu:#1a5fb4;--bleu-light:#3584e4;--bleu-pale:#d0e4f7;--bleu-bg:#eaf2fc;--bleu-dark:#13447a;--noir:#1a1a2e;--noir-mid:#2d2d44;--gris:#6b7280;--gris-light:#e5e7eb;--gris-pale:#f3f4f6;--blanc:#ffffff;--danger:#dc2626;--success:#16a34a;--warning:#f59e0b;--radius:10px;--radius-sm:7px;--shadow:0 2px 16px rgba(26,95,180,.08);--shadow-lg:0 8px 32px rgba(26,95,180,.12)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',sans-serif;background:var(--gris-pale);color:var(--noir);min-height:100vh}
+
+        /* HEADER */
+        header{background:var(--blanc);border-bottom:3px solid var(--bleu);padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+        .header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px;gap:12px}
+        .logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
+        .logo-mark{width:40px;height:40px;flex-shrink:0}.logo-mark svg{width:100%;height:100%}
+        .logo-text{display:flex;flex-direction:column;line-height:1}
+        .logo-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:19px;color:var(--noir);letter-spacing:-.5px}
+        .logo-sub{font-family:'Caveat',cursive;font-size:13px;color:var(--bleu);font-weight:600;margin-top:1px}
+        .header-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+        .btn-hdr{height:36px;padding:0 14px;border-radius:var(--radius-sm);background:var(--blanc);border:1px solid var(--gris-light);color:var(--noir-mid);cursor:pointer;font-size:13px;font-weight:500;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:6px;transition:all .2s}
+        .btn-hdr:hover{background:var(--bleu-bg);border-color:var(--bleu-pale);color:var(--bleu)}.btn-hdr i{font-size:13px}
+        .btn-hdr-primary{background:var(--bleu);color:#fff;border-color:var(--bleu)}.btn-hdr-primary:hover{background:var(--bleu-dark);border-color:var(--bleu-dark);color:#fff}
+
+        /* STATS BAR */
+        .stats-bar{max-width:1200px;margin:20px auto 0;padding:0 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+        .stat-card{background:var(--blanc);border-radius:var(--radius);padding:16px 20px;border:1px solid var(--gris-light);box-shadow:var(--shadow);display:flex;align-items:center;gap:14px}
+        .stat-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+        .stat-icon.blue{background:var(--bleu-bg);color:var(--bleu)}
+        .stat-icon.green{background:#f0fdf4;color:var(--success)}
+        .stat-icon.orange{background:#fffbeb;color:var(--warning)}
+        .stat-icon.red{background:#fef2f2;color:var(--danger)}
+        .stat-value{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;line-height:1}
+        .stat-label{font-size:12px;color:var(--gris);margin-top:2px}
+
+        /* TOOLBAR */
+        .toolbar{max-width:1200px;margin:20px auto 0;padding:0 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+        .search-box{flex:1;min-width:200px;position:relative}
+        .search-box input{width:100%;padding:9px 12px 9px 38px;background:var(--blanc);border:1px solid var(--gris-light);border-radius:var(--radius-sm);font-size:13.5px;font-family:'Inter',sans-serif;color:var(--noir);outline:none;transition:border-color .2s,box-shadow .2s}
+        .search-box input:focus{border-color:var(--bleu);box-shadow:0 0 0 3px rgba(26,95,180,.1)}
+        .search-box i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gris);font-size:14px}
+        .filter-select{padding:9px 32px 9px 12px;background:var(--blanc);border:1px solid var(--gris-light);border-radius:var(--radius-sm);font-size:13px;font-family:'Inter',sans-serif;color:var(--noir);cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;outline:none}
+        .filter-select:focus{border-color:var(--bleu)}
+
+        /* TABLE */
+        .table-container{max-width:1200px;margin:16px auto 40px;padding:0 24px}
+        .table-wrap{background:var(--blanc);border-radius:var(--radius);border:1px solid var(--gris-light);box-shadow:var(--shadow);overflow:hidden}
+        .table-wrap table{width:100%;border-collapse:collapse}
+        .table-wrap th{background:var(--bleu-bg);color:var(--bleu-dark);font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:12px 14px;text-align:left;white-space:nowrap;border-bottom:2px solid var(--bleu-pale)}
+        .table-wrap td{padding:12px 14px;font-size:13px;border-bottom:1px solid var(--gris-pale);vertical-align:middle}
+        .table-wrap tr:hover td{background:#fafbfc}
+        .table-wrap tr:last-child td{border-bottom:none}
+        .badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+        .badge-nouveau{background:#dbeafe;color:#1d4ed8}
+        .badge-en-cours{background:#fef3c7;color:#92400e}
+        .badge-termine{background:#d1fae5;color:#065f46}
+        .badge-annule{background:#fee2e2;color:#991b1b}
+        .badge-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+        .btn-action{width:30px;height:30px;border-radius:6px;border:1px solid var(--gris-light);background:var(--blanc);color:var(--noir-mid);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:12px;transition:all .2s}
+        .btn-action:hover{background:var(--bleu-bg);border-color:var(--bleu-pale);color:var(--bleu)}
+        .btn-action.danger:hover{background:#fef2f2;border-color:#fecaca;color:var(--danger)}
+        .btn-action i{pointer-events:none}
+        .entreprise-cell{font-weight:600;color:var(--noir);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .contact-cell{color:var(--noir-mid);font-size:12.5px}
+        .date-cell{color:var(--gris);font-size:12px;white-space:nowrap}
+        .ref-cell{font-family:'Space Grotesk',sans-serif;font-size:12px;color:var(--bleu);font-weight:500}
+        .id-cell{font-family:monospace;font-size:11px;color:var(--gris)}
+        .sig-thumb{width:60px;height:30px;object-fit:contain;border:1px solid var(--gris-light);border-radius:4px;background:#fff}
+        .sig-none{color:var(--gris-light);font-size:11px}
+        .actions-cell{display:flex;gap:6px}
+
+        /* MOBILE CARDS */
+        .cards-view{display:none}
+        .brief-card{background:var(--blanc);border:1px solid var(--gris-light);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow);border-left:4px solid var(--bleu)}
+        .brief-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+        .brief-card-title{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:var(--noir)}
+        .brief-card-date{font-size:11.5px;color:var(--gris);margin-top:2px}
+        .brief-card-body{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;font-size:12.5px}
+        .brief-card-body dt{color:var(--gris);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.3px}
+        .brief-card-body dd{color:var(--noir-mid);margin-bottom:4px}
+        .brief-card-footer{display:flex;gap:8px;margin-top:12px;justify-content:flex-end}
+
+        /* EMPTY STATE */
+        .empty-state{text-align:center;padding:60px 20px;color:var(--gris)}
+        .empty-state i{font-size:48px;margin-bottom:16px;opacity:.3}
+        .empty-state h3{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:600;color:var(--noir-mid);margin-bottom:8px}
+        .empty-state p{font-size:13.5px;max-width:360px;margin:0 auto}
+
+        /* LOADING */
+        .loading-state{text-align:center;padding:60px 20px}
+        .loading-spinner{width:36px;height:36px;border:3px solid var(--bleu-pale);border-top-color:var(--bleu);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .loading-state p{color:var(--gris);font-size:14px}
+
+        /* MODAL DETAIL */
+        .modal-bg{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+        .modal-bg.show{display:flex}
+        .modal{background:var(--blanc);border-radius:var(--radius);max-width:700px;width:100%;max-height:90vh;overflow-y:auto;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:modalIn .3s ease}
+        @keyframes modalIn{from{opacity:0;transform:scale(.96) translateY(16px)}to{opacity:1;transform:scale(1) translateY(0)}}
+        .modal h2{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;margin-bottom:4px;color:var(--noir);display:flex;align-items:center;gap:10px}
+        .modal h2 i{color:var(--bleu)}
+        .modal-subtitle{font-size:12.5px;color:var(--gris);margin-bottom:20px}
+        .detail-section{margin-bottom:20px}
+        .detail-section h3{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;color:var(--bleu);text-transform:uppercase;letter-spacing:.3px;margin-bottom:10px;padding-bottom:6px;border-bottom:1.5px solid var(--bleu-pale);display:flex;align-items:center;gap:8px}
+        .detail-section h3 i{font-size:13px}
+        .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 20px}
+        .detail-item{display:flex;flex-direction:column;gap:2px}
+        .detail-label{font-size:11px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:.3px}
+        .detail-value{font-size:13.5px;color:var(--noir)}
+        .detail-value.empty{color:var(--gris-light);font-style:italic}
+        .detail-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+        .detail-tag{padding:4px 10px;background:var(--bleu-bg);color:var(--bleu-dark);border-radius:20px;font-size:12px;font-weight:500}
+        .detail-tag.empty{background:var(--gris-pale);color:var(--gris);font-style:italic}
+        .sig-preview{display:flex;gap:16px;margin-top:8px}
+        .sig-preview-item{text-align:center}
+        .sig-preview-item .sig-label{font-size:11px;font-weight:600;color:var(--gris);margin-bottom:6px;text-transform:uppercase}
+        .sig-preview-item img{max-width:200px;max-height:100px;border:1px solid var(--gris-light);border-radius:6px;background:#fff}
+        .sig-preview-item .sig-none{color:var(--gris-light);font-size:12px;font-style:italic;padding:20px}
+        .modal-actions{display:flex;gap:10px;margin-top:24px;justify-content:flex-end;flex-wrap:wrap}
+        .btn{padding:9px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;border:none;transition:all .2s;display:inline-flex;align-items:center;gap:7px}
+        .btn-outline{background:var(--blanc);color:var(--noir-mid);border:1px solid var(--gris-light)}
+        .btn-outline:hover{background:var(--gris-pale);border-color:var(--bleu-pale);color:var(--bleu)}
+        .btn-bleu{background:var(--bleu);color:#fff;box-shadow:0 2px 8px rgba(26,95,180,.25)}
+        .btn-bleu:hover{background:var(--bleu-dark)}
+        .btn-danger{background:var(--blanc);color:var(--danger);border:1px solid rgba(220,38,38,.25)}
+        .btn-danger:hover{background:#fef2f2}
+        .btn-success{background:var(--success);color:#fff;box-shadow:0 2px 8px rgba(22,163,74,.25)}
+        .btn-success:hover{background:#15803d}
+        .btn-warning{background:var(--warning);color:#fff;box-shadow:0 2px 8px rgba(245,158,11,.25)}
+        .btn-warning:hover{background:#d97706}
+
+        /* STATUS SELECT */
+        .status-select{padding:4px 8px;border-radius:5px;border:1px solid var(--gris-light);font-size:12px;font-family:'Inter',sans-serif;cursor:pointer;outline:none;background:var(--blanc)}
+        .status-select:focus{border-color:var(--bleu)}
+
+        /* TOAST */
+        .toast-box{position:fixed;top:76px;right:20px;z-index:1000;display:flex;flex-direction:column;gap:8px}
+        .toast{padding:12px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow-lg);max-width:400px;animation:toastIn .35s ease,toastOut .35s ease 2.8s forwards}
+        .toast-ok{background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d}
+        .toast-err{background:#fef2f2;border:1px solid #fecaca;color:#dc2626}
+        .toast-info{background:var(--bleu-bg);border:1px solid var(--bleu-pale);color:var(--bleu-dark)}
+        @keyframes toastIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+        @keyframes toastOut{from{opacity:1}to{opacity:0;transform:translateX(30px)}}
+
+        /* CONFIRM MODAL */
+        .confirm-modal{max-width:420px;text-align:center}
+        .confirm-modal p{margin-bottom:20px}
+        .confirm-modal .modal-actions{justify-content:center}
+
+        /* PAGINATION */
+        .pagination{display:flex;align-items:center;justify-content:center;gap:4px;margin-top:16px;padding-bottom:8px}
+        .page-btn{width:34px;height:34px;border-radius:6px;border:1px solid var(--gris-light);background:var(--blanc);color:var(--noir-mid);cursor:pointer;font-size:13px;font-weight:500;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;transition:all .2s}
+        .page-btn:hover{background:var(--bleu-bg);border-color:var(--bleu-pale);color:var(--bleu)}
+        .page-btn.active{background:var(--bleu);color:#fff;border-color:var(--bleu)}
+        .page-btn:disabled{opacity:.3;cursor:not-allowed}
+        .page-info{font-size:12px;color:var(--gris);margin:0 8px}
+
+        ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--gris-light);border-radius:3px}
+
+        @media(max-width:768px){
+            .header-right .btn-hdr span{display:none}
+            .stats-bar{grid-template-columns:1fr 1fr;gap:8px;padding:0 16px}
+            .stat-card{padding:12px 14px}
+            .stat-value{font-size:22px}
+            .toolbar{padding:0 16px}
+            .table-container{padding:0 16px}
+            .table-wrap{display:none}
+            .cards-view{display:block;padding:0 16px;max-width:1200px;margin:16px auto 40px}
+            .detail-grid{grid-template-columns:1fr}
+            .sig-preview{flex-direction:column;align-items:center}
+            .modal{padding:20px;margin:10px}
+            .brief-card-body{grid-template-columns:1fr}
+        }
+        @media(max-width:480px){
+            .stats-bar{grid-template-columns:1fr 1fr}
+            .toolbar{flex-direction:column}.search-box{min-width:100%}
+        }
+        @media print{header,.toolbar,.pagination{display:none!important}.table-container{padding:0!important}.table-wrap{box-shadow:none!important;border:none!important}.table-wrap th{background:#eaf2fc!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-inner">
+        <a href="2index.html" class="logo">
+            <div class="logo-mark">
+                <svg viewBox="0 0 48 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs><linearGradient id="logoGrad" x1="0" y1="0" x2="48" y2="60" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#3584e4"/><stop offset="100%" stop-color="#1a5fb4"/></linearGradient><linearGradient id="logoGrad2" x1="10" y1="0" x2="38" y2="60" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#62a0ea"/><stop offset="50%" stop-color="#3584e4"/><stop offset="100%" stop-color="#1a5fb4"/></linearGradient></defs>
+                    <circle cx="24" cy="10" r="8.5" fill="url(#logoGrad)"/>
+                    <path d="M24 18.5C24 18.5 22 22 18 28C14 34 10 38 10 42C10 46 13 50 17 52C20 53.5 23 54 24 54C25 54 28 53.5 31 52C35 50 38 46 38 42C38 38 34 34 30 28C26 22 24 18.5 24 18.5Z" fill="url(#logoGrad2)"/>
+                    <path d="M18 28C14 26 8 28 6 32C4.5 35 5.5 37 7 36.5C8.5 36 10 33 14 31C16 30 17.5 29.5 18 28Z" fill="url(#logoGrad)"/>
+                    <path d="M30 28C34 26 40 28 42 32C43.5 35 42.5 37 41 36.5C39.5 36 38 33 34 31C32 30 30.5 29.5 30 28Z" fill="url(#logoGrad)"/>
+                    <path d="M20 50C18 54 14 58 12 59C10 59.5 10 58 12 56.5C14 55 17 52 19 48Z" fill="url(#logoGrad)"/>
+                    <path d="M28 50C30 54 34 58 36 59C38 59.5 38 58 36 56.5C34 55 31 52 29 48Z" fill="url(#logoGrad)"/>
+                </svg>
+            </div>
+            <div class="logo-text"><span class="logo-name">ITSUPERTECH</span><span class="logo-sub">administration</span></div>
+        </a>
+        <div class="header-right">
+            <button class="btn-hdr" onclick="refreshData()" title="Actualiser"><i class="fas fa-sync-alt"></i><span>Actualiser</span></button>
+            <a href="2index.html" class="btn-hdr btn-hdr-primary" title="Nouveau brief"><i class="fas fa-plus"></i><span>Nouveau brief</span></a>
+        </div>
+    </div>
+</header>
+
+<main>
+    <!-- STATS -->
+    <div class="stats-bar" id="stats-bar">
+        <div class="stat-card"><div class="stat-icon blue"><i class="fas fa-file-alt"></i></div><div><div class="stat-value" id="stat-total">0</div><div class="stat-label">Total briefs</div></div></div>
+        <div class="stat-card"><div class="stat-icon blue"><i class="fas fa-star"></i></div><div><div class="stat-value" id="stat-nouveau">0</div><div class="stat-label">Nouveaux</div></div></div>
+        <div class="stat-card"><div class="stat-icon orange"><i class="fas fa-spinner"></i></div><div><div class="stat-value" id="stat-encours">0</div><div class="stat-label">En cours</div></div></div>
+        <div class="stat-card"><div class="stat-icon green"><i class="fas fa-check-circle"></i></div><div><div class="stat-value" id="stat-termine">0</div><div class="stat-label">Terminés</div></div></div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="search-input" placeholder="Rechercher par entreprise, contact, référence..." oninput="applyFilters()">
+        </div>
+        <select class="filter-select" id="filter-statut" onchange="applyFilters()">
+            <option value="">Tous les statuts</option>
+            <option value="nouveau">Nouveau</option>
+            <option value="en-cours">En cours</option>
+            <option value="termine">Terminé</option>
+            <option value="annule">Annulé</option>
+        </select>
+        <select class="filter-select" id="sort-select" onchange="applyFilters()">
+            <option value="date_desc">Plus récents</option>
+            <option value="date_asc">Plus anciens</option>
+            <option value="entreprise">Entreprise A-Z</option>
+            <option value="contact">Contact A-Z</option>
+        </select>
+    </div>
+
+    <!-- TABLE VIEW (desktop) -->
+    <div class="table-container">
+        <div class="table-wrap" id="table-wrap">
+            <div class="loading-state" id="loading-state"><div class="loading-spinner"></div><p>Chargement des briefs...</p></div>
+        </div>
+        <div class="pagination" id="pagination"></div>
+    </div>
+
+    <!-- CARDS VIEW (mobile) -->
+    <div class="cards-view" id="cards-view"></div>
+</main>
+
+<!-- MODAL DETAIL -->
+<div class="modal-bg" id="modal-detail">
+    <div class="modal" id="modal-detail-content">
+        <!-- Filled dynamically -->
+    </div>
+</div>
+
+<!-- MODAL CONFIRM -->
+<div class="modal-bg" id="modal-confirm">
+    <div class="modal confirm-modal">
+        <h2><i class="fas fa-exclamation-triangle" style="color:var(--danger)"></i> Confirmer</h2>
+        <p id="confirm-text">Etes-vous sûr ?</p>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('modal-confirm')">Annuler</button>
+            <button class="btn btn-danger" id="confirm-btn" style="background:var(--danger);color:#fff;border:none"><i class="fas fa-trash-alt"></i> Supprimer</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast-box" id="toast-box"></div>
+
+<script>
+// ===================================================================
+//  GOOGLE SHEETS BACKEND — 0 Ko de bibliothèque
+//  Plus de Firebase ! Utilise Google Apps Script (voir google-apps-script.js)
+// ===================================================================
+var APP_URL='https://script.google.com/macros/s/AKfycbxCHmVJW0CXTNd4omYMq8F8i_Yfgntk8flYE5UmdpvFt-WZUJNAYzseQjbYjYHZsx-1/exec';
+var APP_KEY='itsuptech_brief_2024';
+var firebaseReady=false;
+
+// Test de connexion + chargement
+fetch(APP_URL+'?key='+APP_KEY,{method:'GET'}).then(function(r){return r.json()}).then(function(d){if(d.briefs!==undefined||d.ok!==undefined){firebaseReady=true;loadBriefs()}else throw new Error('Erreur backend')}).catch(function(e){firebaseReady=false;document.getElementById('loading-state').innerHTML='<div class="empty-state"><i class="fas fa-exclamation-circle"></i><h3>Connexion au backend</h3><p>Déployez le Google Apps Script (voir google-apps-script.js) et collez l\'URL dans le code</p></div>'});
+
+// ===================================================================
+//  DICTIONNAIRE DE DECODAGE
+// ===================================================================
+// Memes codes que 2index.html : 's2' = support index 2 = 'Carte de visite'
+var CB_LABELS={support:['Flyer','Bâche','Carte de visite','Brochure','Affiche','Dépliant','Logo','Carte menu','Enseigne','Sticker','Roll-up','Autre'],objectif:["Présenter l'entreprise",'Promouvoir un événement','Lancer un produit','Informer','Vendre un produit/service','Créer une identité visuelle','Fidéliser la clientèle','Autre'],public:['Entreprises','Particuliers','Étudiants','Administrations','Associations','Enfants / Jeunes','Seniors','Autre'],info:['Présentation entreprise','Coordonnées','Liste des services','Liste des produits','Tarifs','Témoignages clients',"Horaires d'ouverture",'Réseaux sociaux','Site web','Promotion / Offre spéciale'],redaction:['Le client fournit le texte','ITSUPERTECH rédige','Révision ensemble'],langue:['Français','Anglais','Arabe','Tamazight','Autre'],images:['Logo HD','Photos de produits','Images libres de droits',"Pas d'images",'Autre'],docs:['Ancien support imprimé','Charte graphique','Brochures existantes','Aucun document','Autre'],style:['Moderne','Classique','Minimaliste','Coloré','Épuré','Professionnel','Luxe / Premium','Ludique / Créatif'],joindre:['Logo vectoriel','Charte graphique','Photos haute résolution','Textes rédigés','Ancienne version','Autre']};
+var CB_PREFIX_MAP={};Object.keys(CB_LABELS).forEach(function(g){CB_LABELS[g].forEach(function(_,i){CB_PREFIX_MAP[({support:'s',objectif:'o',public:'p',info:'i',redaction:'r',langue:'l',images:'img',docs:'d',style:'st',joindre:'j'})[g]+i]=CB_LABELS[g][i]})});
+
+// Decode un tableau de codes courts (ex ['s2','s3']) en labels (ex ['Carte de visite','Brochure'])
+// Compatible aussi avec l'ancien format texte direct
+function decodeCodes(arr){if(!arr)return[];return arr.map(function(c){return CB_PREFIX_MAP[c]||c})}
+
+// ===================================================================
+//  DATA
+// ===================================================================
+let allBriefs = [];
+let filteredBriefs = [];
+let currentPage = 1;
+const perPage = 15;
+
+const STATUS_MAP = {
+    'nouveau': { label: 'Nouveau', cls: 'badge-nouveau' },
+    'en-cours': { label: 'En cours', cls: 'badge-en-cours' },
+    'termine': { label: 'Terminé', cls: 'badge-termine' },
+    'annule': { label: 'Annulé', cls: 'badge-annule' }
+};
+
+// ===================================================================
+//  LOAD DATA
+// ===================================================================
+function loadBriefs() {
+    if (!firebaseReady) return;
+    document.getElementById('loading-state').style.display = '';
+    document.getElementById('loading-state').innerHTML = '<div class="loading-spinner"></div><p>Chargement des briefs...</p>';
+
+    fetch(APP_URL+'?key='+APP_KEY).then(function(r){return r.json()}).then(function(data){
+        allBriefs = (data.briefs || []).map(function(d){
+            if (!d.statut) d.statut = 'nouveau';
+            return d;
+        });
+        document.getElementById('loading-state').style.display='none';
+        applyFilters();
+        updateStats();
+    }).catch(function(err) {
+        console.error('Erreur:', err);
+        document.getElementById('loading-state').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><h3>Erreur de connexion</h3><p>' + err.message + '</p></div>';
+    });
+}
+
+function refreshData() {
+    loadBriefs();
+    toast('Données actualisées', 'info');
+}
+
+// ===================================================================
+//  FILTERS & SORT
+// ===================================================================
+function applyFilters() {
+    var search = document.getElementById('search-input').value.trim().toLowerCase();
+    var statutFilter = document.getElementById('filter-statut').value;
+    var sort = document.getElementById('sort-select').value;
+
+    filteredBriefs = allBriefs.filter(function(b) {
+        if (statutFilter && b.statut !== statutFilter) return false;
+        if (search) {
+            var haystack = [(b.entreprise||''),(b.contact||''),(b.email||''),(b.telephone||''),(b._id||'')].join(' ').toLowerCase();
+            var champs = b.champs || {};
+            Object.values(champs).forEach(function(v) { haystack += ' ' + (v||'').toLowerCase(); });
+            if (haystack.indexOf(search) === -1) return false;
+        }
+        return true;
+    });
+
+    // Sort
+    filteredBriefs.sort(function(a, b) {
+        switch(sort) {
+            case 'date_asc': return (a.date_creation_str||'').localeCompare(b.date_creation_str||'');
+            case 'entreprise': return (a.entreprise||'').localeCompare(b.entreprise||'');
+            case 'contact': return (a.contact||'').localeCompare(b.contact||'');
+            default: return (b.date_creation_str||'').localeCompare(a.date_creation_str||'');
+        }
+    });
+
+    currentPage = 1;
+    renderAll();
+}
+
+// ===================================================================
+//  STATS
+// ===================================================================
+function updateStats() {
+    var total = allBriefs.length;
+    var nouveaux = allBriefs.filter(function(b){return b.statut==='nouveau'}).length;
+    var encours = allBriefs.filter(function(b){return b.statut==='en-cours'}).length;
+    var termines = allBriefs.filter(function(b){return b.statut==='termine'}).length;
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-nouveau').textContent = nouveaux;
+    document.getElementById('stat-encours').textContent = encours;
+    document.getElementById('stat-termine').textContent = termines;
+}
+
+// ===================================================================
+//  RENDER
+// ===================================================================
+function renderAll() {
+    renderTable();
+    renderCards();
+    renderPagination();
+}
+
+function renderTable() {
+    var wrap = document.getElementById('table-wrap');
+    if (filteredBriefs.length === 0) {
+        wrap.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><h3>Aucun brief trouvé</h3><p>' + (allBriefs.length === 0 ? 'Aucun brief n\'a encore été enregistré.' : 'Aucun résultat ne correspond à vos filtres.') + '</p></div>';
+        return;
+    }
+    var start = (currentPage - 1) * perPage;
+    var pageData = filteredBriefs.slice(start, start + perPage);
+
+    var html = '<table><thead><tr>' +
+        '<th>Réf</th><th>Entreprise</th><th>Contact</th><th>Date</th><th>Signature</th><th>Statut</th><th>Actions</th>' +
+        '</tr></thead><tbody>';
+
+    pageData.forEach(function(b) {
+        var st = STATUS_MAP[b.statut] || STATUS_MAP['nouveau'];
+        var dateStr = b.date_creation_str || formatTimestamp(b.date_creation);
+        var hasSigClient = b.signature_client && b.signature_client !== '';
+        var hasSigITSuper = b.signature_itsuper && b.signature_itsuper !== '';
+
+        html += '<tr>';
+        html += '<td class="id-cell" title="' + b._id + '">' + b._id.substring(0, 8) + '...</td>';
+        html += '<td class="entreprise-cell" title="' + esc(b.entreprise) + '">' + esc(b.entreprise || '-') + '</td>';
+        html += '<td class="contact-cell">' + esc(b.contact || '-') + '<br><span style="color:var(--gris);font-size:11px">' + esc(b.email || '') + '</span></td>';
+        html += '<td class="date-cell">' + esc(dateStr) + '</td>';
+        html += '<td>';
+        if (hasSigClient) html += '<img src="' + b.signature_client + '" class="sig-thumb" title="Client">';
+        else html += '<span class="sig-none"><i class="fas fa-times"></i></span>';
+        if (hasSigITSuper) html += ' <img src="' + b.signature_itsuper + '" class="sig-thumb" title="ITSUPERTECH">';
+        html += '</td>';
+        html += '<td><select class="status-select" onchange="changeStatus(\'' + b._id + '\',this.value)">';
+        ['nouveau','en-cours','termine','annule'].forEach(function(s) {
+            var sl = STATUS_MAP[s];
+            html += '<option value="' + s + '"' + (b.statut === s ? ' selected' : '') + '>' + sl.label + '</option>';
+        });
+        html += '</select></td>';
+        html += '<td class="actions-cell">';
+        html += '<button class="btn-action" title="Voir les détails" onclick="showDetail(\'' + b._id + '\')"><i class="fas fa-eye"></i></button>';
+        html += '<button class="btn-action" title="Copier le lien" onclick="copyId(\'' + b._id + '\')"><i class="fas fa-link"></i></button>';
+        html += '<button class="btn-action danger" title="Supprimer" onclick="confirmDelete(\'' + b._id + '\')"><i class="fas fa-trash-alt"></i></button>';
+        html += '</td></tr>';
+    });
+
+    html += '</tbody></table>';
+    wrap.innerHTML = html;
+}
+
+function renderCards() {
+    var container = document.getElementById('cards-view');
+    if (filteredBriefs.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+    var start = (currentPage - 1) * perPage;
+    var pageData = filteredBriefs.slice(start, start + perPage);
+
+    var html = '';
+    pageData.forEach(function(b) {
+        var st = STATUS_MAP[b.statut] || STATUS_MAP['nouveau'];
+        var dateStr = b.date_creation_str || formatTimestamp(b.date_creation);
+        html += '<div class="brief-card">';
+        html += '<div class="brief-card-header"><div><div class="brief-card-title">' + esc(b.entreprise || 'Sans nom') + '</div><div class="brief-card-date"><i class="far fa-clock"></i> ' + esc(dateStr) + '</div></div><span class="badge ' + st.cls + '"><span class="badge-dot"></span>' + st.label + '</span></div>';
+        html += '<dl class="brief-card-body">';
+        html += '<dt>Contact</dt><dd>' + esc(b.contact || '-') + '</dd>';
+        html += '<dt>Email</dt><dd>' + esc(b.email || '-') + '</dd>';
+        html += '<dt>Téléphone</dt><dd>' + esc(b.telephone || '-') + '</dd>';
+        html += '<dt>Référence</dt><dd>' + esc((b.champs && b.champs.f_ref) || '-') + '</dd>';
+        html += '</dl>';
+        html += '<div class="brief-card-footer">';
+        html += '<button class="btn btn-outline" style="font-size:12px;padding:7px 14px" onclick="showDetail(\'' + b._id + '\')"><i class="fas fa-eye"></i> Détails</button>';
+        html += '<button class="btn btn-danger" style="font-size:12px;padding:7px 14px" onclick="confirmDelete(\'' + b._id + '\')"><i class="fas fa-trash-alt"></i></button>';
+        html += '</div></div>';
+    });
+    container.innerHTML = html;
+}
+
+function renderPagination() {
+    var total = Math.ceil(filteredBriefs.length / perPage);
+    var el = document.getElementById('pagination');
+    if (total <= 1) { el.innerHTML = ''; return; }
+    var html = '';
+    html += '<button class="page-btn" onclick="goPage(' + (currentPage-1) + ')"' + (currentPage===1?' disabled':'') + '><i class="fas fa-chevron-left"></i></button>';
+    var startP = Math.max(1, currentPage - 2);
+    var endP = Math.min(total, currentPage + 2);
+    if (startP > 1) html += '<button class="page-btn" onclick="goPage(1)">1</button>';
+    if (startP > 2) html += '<span class="page-info">...</span>';
+    for (var i = startP; i <= endP; i++) {
+        html += '<button class="page-btn' + (i===currentPage?' active':'') + '" onclick="goPage(' + i + ')">' + i + '</button>';
+    }
+    if (endP < total - 1) html += '<span class="page-info">...</span>';
+    if (endP < total) html += '<button class="page-btn" onclick="goPage(' + total + ')">' + total + '</button>';
+    html += '<button class="page-btn" onclick="goPage(' + (currentPage+1) + ')"' + (currentPage===total?' disabled':'') + '><i class="fas fa-chevron-right"></i></button>';
+    html += '<span class="page-info">' + filteredBriefs.length + ' résultat(s)</span>';
+    el.innerHTML = html;
+}
+
+function goPage(p) {
+    var total = Math.ceil(filteredBriefs.length / perPage);
+    if (p < 1 || p > total) return;
+    currentPage = p;
+    renderAll();
+    window.scrollTo({ top: 200, behavior: 'smooth' });
+}
+
+// ===================================================================
+//  DETAIL MODAL
+// ===================================================================
+function showDetail(id) {
+    var b = allBriefs.find(function(x) { return x._id === id; });
+    if (!b) return;
+    var st = STATUS_MAP[b.statut] || STATUS_MAP['nouveau'];
+    var dateStr = b.date_creation_str || formatTimestamp(b.date_creation);
+    // Compatible avec l'ancien format (champs.f_xxx) et le nouveau (f_xxx direct)
+    var c = function(id){ return (b.champs && b.champs[id]) || b[id] || ''; };
+
+    var html = '<h2><i class="fas fa-file-alt"></i> ' + esc(b.entreprise || 'Brief') + '</h2>';
+    html += '<div class="modal-subtitle">Créé le ' + esc(dateStr) + ' &mdash; <span class="badge ' + st.cls + '"><span class="badge-dot"></span>' + st.label + '</span> &mdash; ID: <code style="font-size:11px">' + b._id + '</code></div>';
+
+    // Info générales
+    html += '<div class="detail-section"><h3><i class="fas fa-user"></i> Informations client</h3><div class="detail-grid">';
+    html += detailField('Entreprise', b.entreprise);
+    html += detailField('Contact', b.contact);
+    html += detailField('Téléphone', b.telephone);
+    html += detailField('Email', b.email);
+    html += detailField('Adresse', c('f_adresse'));
+    html += detailField('Date du brief', c('f_date'));
+    html += detailField('Référence', c('f_ref'));
+    html += '</div></div>';
+
+    // Supports
+    html += '<div class="detail-section"><h3><i class="fas fa-print"></i> Support demandé</h3>';
+    html += detailTags(decodeCodes(b.supports));
+    html += '</div>';
+
+    // Objectifs
+    html += '<div class="detail-section"><h3><i class="fas fa-bullseye"></i> Objectifs</h3>';
+    html += detailTags(decodeCodes(b.objectifs));
+    html += '</div>';
+
+    // Public cible
+    html += '<div class="detail-section"><h3><i class="fas fa-users"></i> Public cible</h3>';
+    html += detailTags(decodeCodes(b.publicCible));
+    html += '</div>';
+
+    // Contenu
+    html += '<div class="detail-section"><h3><i class="fas fa-clipboard-list"></i> Contenu</h3><div class="detail-grid">';
+    html += detailField('Informations à afficher', decodeCodes(b.infosContenu).join(', '));
+    html += detailField('Rédaction', decodeCodes(b.redaction).join(', '));
+    html += detailField('Langues', decodeCodes(b.langues).join(', '));
+    html += detailField('Images fournies', decodeCodes(b.images).join(', '));
+    html += detailField('Documents existants', decodeCodes(b.documents).join(', '));
+    html += detailField('Style', decodeCodes(b.styles).join(', '));
+    html += detailField('Couleurs préférées', c('f_couleurs'));
+    html += detailField('Réf. visuelle', c('f_refvis'));
+    html += detailField('Texte fourni', c('f_texte'));
+    html += '</div></div>';
+
+    // Technique
+    html += '<div class="detail-section"><h3><i class="fas fa-cogs"></i> Spécifications techniques</h3><div class="detail-grid">';
+    html += detailField('Couleurs à respecter', c('f_couleursrespect'));
+    html += detailField('Nombre de pages', c('f_nbpages'));
+    html += detailField('Format fichier', c('f_formatfich'));
+    html += detailField('Résolution', c('f_resolution'));
+    html += detailField('Dimensions', c('f_dimensions'));
+    html += detailField('Marges', c('f_marge'));
+    html += detailField('Impression', c('f_impression'));
+    html += detailField('Papier', c('f_papier'));
+    html += detailField('Contraintes', c('f_contraintes'));
+    html += '</div></div>';
+
+    // Livraison
+    html += '<div class="detail-section"><h3><i class="fas fa-truck"></i> Livraison</h3><div class="detail-grid">';
+    html += detailField('Date de livraison', c('f_dateliv'));
+    html += detailField('Exemplaires', c('f_exemplaires'));
+    html += detailField('Mode de livraison', c('f_mode_livraison'));
+    html += detailField('Fichiers à joindre', decodeCodes(b.fichiersJoindre).join(', '));
+    html += detailField('Observations', c('f_observations'));
+    html += '</div></div>';
+
+    // Signatures
+    html += '<div class="detail-section"><h3><i class="fas fa-signature"></i> Signatures</h3><div class="sig-preview">';
+    html += '<div class="sig-preview-item"><div class="sig-label">Client</div>';
+    if (b.signature_client && b.signature_client !== '') html += '<img src="' + b.signature_client + '">';
+    else html += '<div class="sig-none">Non signé</div>';
+    html += '</div>';
+    html += '<div class="sig-preview-item"><div class="sig-label">ITSUPERTECH</div>';
+    if (b.signature_itsuper && b.signature_itsuper !== '') html += '<img src="' + b.signature_itsuper + '">';
+    else html += '<div class="sig-none">Non signé</div>';
+    html += '</div></div></div>';
+
+    // Actions
+    html += '<div class="modal-actions">';
+    html += '<button class="btn btn-warning" onclick="changeStatusModal(\'' + b._id + '\',\'en-cours\')"><i class="fas fa-spinner"></i> En cours</button>';
+    html += '<button class="btn btn-success" onclick="changeStatusModal(\'' + b._id + '\',\'termine\')"><i class="fas fa-check"></i> Terminer</button>';
+    html += '<button class="btn btn-outline" onclick="closeModal(\'modal-detail\')">Fermer</button>';
+    html += '</div>';
+
+    document.getElementById('modal-detail-content').innerHTML = html;
+    document.getElementById('modal-detail').classList.add('show');
+}
+
+function detailField(label, value) {
+    var v = (value && String(value).trim() !== '') ? esc(String(value)) : '<span class="detail-value empty">-</span>';
+    if (v.indexOf('detail-value empty') === -1) v = '<span class="detail-value">' + v + '</span>';
+    return '<div class="detail-item"><span class="detail-label">' + esc(label) + '</span>' + v + '</div>';
+}
+
+function detailTags(arr) {
+    if (!arr || arr.length === 0) return '<span class="detail-tag empty">Aucun</span>';
+    return '<div class="detail-tags">' + arr.map(function(t) { return '<span class="detail-tag">' + esc(t) + '</span>'; }).join('') + '</div>';
+}
+
+// ===================================================================
+//  ACTIONS
+// ===================================================================
+function changeStatus(id, newStatus) {
+    if (!firebaseReady) return;
+    fetch(APP_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'update',key:APP_KEY,id:id,data:{statut:newStatus}})}).then(function(r){return r.json()}).then(function(res){
+        if (res.error) throw new Error(res.error);
+        var b = allBriefs.find(function(x) { return x._id === id; });
+        if (b) b.statut = newStatus;
+        updateStats();
+        renderAll();
+        toast('Statut mis à jour', 'ok');
+    }).catch(function(err) {
+        toast('Erreur: ' + err.message, 'err');
+    });
+}
+
+function changeStatusModal(id, newStatus) {
+    changeStatus(id, newStatus);
+    closeModal('modal-detail');
+}
+
+var _pendingDeleteId = null;
+function confirmDelete(id) {
+    _pendingDeleteId = id;
+    document.getElementById('modal-confirm').classList.add('show');
+}
+
+document.getElementById('confirm-btn').addEventListener('click', function() {
+    if (!_pendingDeleteId || !firebaseReady) return;
+    fetch(APP_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'delete',key:APP_KEY,id:_pendingDeleteId})}).then(function(r){return r.json()}).then(function(res){
+        if (res.error) throw new Error(res.error);
+        allBriefs = allBriefs.filter(function(b) { return b._id !== _pendingDeleteId; });
+        applyFilters(); updateStats();
+        toast('Brief supprimé', 'ok');
+    }).catch(function(err) {
+        toast('Erreur: ' + err.message, 'err');
+    });
+    closeModal('modal-confirm');
+    _pendingDeleteId = null;
+});
+
+function copyId(id) {
+    navigator.clipboard.writeText(id).then(function() {
+        toast('ID copié: ' + id.substring(0, 12) + '...', 'ok');
+    }).catch(function() {
+        toast('ID: ' + id, 'info');
+    });
+}
+
+// ===================================================================
+//  UTILS
+// ===================================================================
+function esc(str) {
+    if (!str) return '';
+    var div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+function formatTimestamp(ts) {
+    if (!ts) return '-';
+    try {
+        var d = new Date(ts);
+        return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    } catch(e) { return '-'; }
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+document.querySelectorAll('.modal-bg').forEach(function(bg) {
+    bg.addEventListener('click', function(e) { if (e.target === bg) bg.classList.remove('show'); });
+});
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') document.querySelectorAll('.modal-bg.show').forEach(function(m) { m.classList.remove('show'); });
+});
+
+function toast(msg, type) {
+    var box = document.getElementById('toast-box');
+    var cls = type === 'ok' ? 'toast-ok' : type === 'err' ? 'toast-err' : 'toast-info';
+    var icon = type === 'ok' ? 'fa-check-circle' : type === 'err' ? 'fa-times-circle' : 'fa-info-circle';
+    var t = document.createElement('div');
+    t.className = 'toast ' + cls;
+    t.innerHTML = '<i class="fas ' + icon + '"></i> ' + msg;
+    box.appendChild(t);
+    setTimeout(function() { if (t.parentNode) t.remove(); }, 3400);
+}
+
+// ===================================================================
+//  INIT — loadBriefs() est appele par le test de connexion ci-dessus
+// ===================================================================
+</script>
+</body>
+</html>
